@@ -3,7 +3,7 @@ const cors = require('cors');
 const db = require('./db'); // Imports the database connection you just built
 
 const app = express();
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors()); // Security feature to allow frontend requests
