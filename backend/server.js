@@ -150,6 +150,43 @@ app.post('/api/workouts', authenticateToken, (req, res) => {
     });
 });
 
+// DELETE Route: Delete a workout (verifying ownership)
+app.delete('/api/workouts/:id', authenticateToken, (req, res) => {
+    const workoutId = req.params.id;
+    const userId = req.user.userId;
+
+    const sql = 'DELETE FROM workouts WHERE id = ? AND user_id = ?';
+    db.query(sql, [workoutId, userId], (err, result) => {
+        if (err) {
+            console.error('❌ Error deleting workout:', err);
+            return res.status(500).json({ error: 'Database error' });
+        }
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ error: 'Workout not found or unauthorized' });
+        }
+        res.json({ message: '✅ Workout deleted successfully!' });
+    });
+});
+
+// PUT Route: Update a workout (verifying ownership)
+app.put('/api/workouts/:id', authenticateToken, (req, res) => {
+    const workoutId = req.params.id;
+    const userId = req.user.userId;
+    const { exercise_type, duration_minutes, date_logged } = req.body;
+
+    const sql = 'UPDATE workouts SET exercise_type = ?, duration_minutes = ?, date_logged = ? WHERE id = ? AND user_id = ?';
+    db.query(sql, [exercise_type, duration_minutes, date_logged, workoutId, userId], (err, result) => {
+        if (err) {
+            console.error('❌ Error updating workout:', err);
+            return res.status(500).json({ error: 'Database error' });
+        }
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ error: 'Workout not found or unauthorized' });
+        }
+        res.json({ message: '✅ Workout updated successfully!' });
+    });
+});
+
 // ==========================================
 // 5. SERVER START
 // ==========================================

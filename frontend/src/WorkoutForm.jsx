@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-function WorkoutForm() {
+function WorkoutForm({ onWorkoutAdded }) {
   const [exerciseType, setExerciseType] = useState('');
   const [duration, setDuration] = useState('');
   const [date, setDate] = useState('');
@@ -31,6 +31,9 @@ function WorkoutForm() {
         setExerciseType('');
         setDuration('');
         setDate('');
+        if (onWorkoutAdded) {
+          onWorkoutAdded();
+        }
       } else {
         const data = await response.json();
         alert(`❌ Error: ${data.error}`);
