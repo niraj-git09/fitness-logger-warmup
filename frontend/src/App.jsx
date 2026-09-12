@@ -2,31 +2,54 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import './App.css';
 import WorkoutForm from './WorkoutForm';
 import WorkoutFeed from './WorkoutFeed';
-import Login from './Login';       // Import the real Login component
-import Register from './Register'; // Import the real Register component
+import Login from './Login';
+import Register from './Register';
+import Navbar from './Navbar';
 
-// This acts as your private dashboard
+// 1. THE FRONTEND BOUNCER
+// This function checks for a token before rendering the page
+const ProtectedRoute = ({ children }) => {
+  const token = localStorage.getItem('token');
+  
+  // If there is no token, redirect them instantly to login
+  if (!token) {
+    return <Navigate to="/login" />;
+  }
+  
+  // If they have a token, let them see the component (children)
+  return children;
+};
+
 const Dashboard = () => (
-  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-    <h2>My Fitness Dashboard</h2>
-    <WorkoutForm />
-    <WorkoutFeed />
+  <div>
+    <Navbar />
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <WorkoutForm />
+      <WorkoutFeed />
+    </div>
   </div>
 );
 
 function App() {
   return (
     <Router>
-      <div style={{ padding: '40px', fontFamily: 'sans-serif', textAlign: 'center' }}>
-        <h1>Daily Fitness Logger</h1>
-        
+      <div style={{ padding: '20px', fontFamily: 'sans-serif', textAlign: 'center' }}>
         <Routes>
           <Route path="/" element={<Navigate to="/login" />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/dashboard" element={<Dashboard />} />
+          
+          {/* 2. PROTECTED DASHBOARD ROUTE */}
+          {/* We wrap the Dashboard inside our new ProtectedRoute */}
+          <Route 
+            path="/dashboard" 
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            } 
+          />
         </Routes>
-        
       </div>
     </Router>
   );

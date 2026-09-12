@@ -1,43 +1,47 @@
 import { useState, useEffect } from 'react';
 
 function WorkoutFeed() {
-  // 1. State to hold the array of workouts we get from the database
   const [workouts, setWorkouts] = useState([]);
 
-  // 2. Function to fetch the data from our Node.js GET route
-  const fetchWorkouts = async () => {
-    try {
-      const response = await fetch('http://localhost:5000/api/workouts');
-      if (response.ok) {
-        const data = await response.json();
-        setWorkouts(data); // Save the data into our state
-      }
-    } catch (error) {
-      console.error('Error fetching workouts:', error);
-    }
-  };
-
-  // 3. useEffect tells React to run this fetch function as soon as the component loads
   useEffect(() => {
+    const fetchWorkouts = async () => {
+      // Grab the VIP wristband
+      const token = localStorage.getItem('token');
+
+      try {
+        const response = await fetch('http://localhost:5000/api/workouts', {
+          headers: {
+            // Show the token to fetch your specific data
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setWorkouts(data);
+        } else {
+          console.error("Failed to fetch workouts");
+        }
+      } catch (error) {
+        console.error("Server error", error);
+      }
+    };
+
     fetchWorkouts();
   }, []);
 
-  // 4. The visual UI mapping over the array of workouts
   return (
-    <div style={{ border: '1px solid #ccc', padding: '20px', borderRadius: '8px', width: '100%', maxWidth: '400px' }}>
-      <h2>Workout History</h2>
-      
+    <div style={{ maxWidth: '500px', margin: '0 auto', textAlign: 'left' }}>
+      <h3>Your History</h3>
       {workouts.length === 0 ? (
         <p>No workouts logged yet. Get to work!</p>
       ) : (
-        <ul style={{ listStyleType: 'none', padding: 0 }}>
+        <ul style={{ listStyle: 'none', padding: 0 }}>
           {workouts.map((workout) => (
-            <li key={workout.id} style={{ borderBottom: '1px solid #eee', padding: '10px 0' }}>
-              <strong style={{ color: '#007bff' }}>{workout.exercise_type}</strong> - {workout.duration_minutes} mins 
+            <li key={workout.id} style={{ background: '#f4f4f4', margin: '10px 0', padding: '15px', borderRadius: '5px' }}>
+              <strong>{workout.exercise_type}</strong> - {workout.duration_minutes} mins 
               <br />
-              <small style={{ color: '#666' }}>
-                {new Date(workout.date_logged).toLocaleDateString()}
-              </small>
+              <small style={{ color: '#666' }}>Logged on: {workout.date_logged.split('T')[0]}</small>
             </li>
           ))}
         </ul>
