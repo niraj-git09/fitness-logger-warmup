@@ -24,16 +24,16 @@ app.get('/', (req, res) => {
 
 // POST Route: Register a new user
 app.post('/api/register', async (req, res) => {
-    const { email, password } = req.body;
+    const { email, password, name } = req.body;
     
     try {
         // Scramble the password using bcrypt (10 rounds of hashing)
         const hashedPassword = await bcrypt.hash(password, 10);
         
         // Save the new user to the database
-        const sql = 'INSERT INTO users (email, password) VALUES (?, ?)';
+        const sql = 'INSERT INTO users (email, password, name) VALUES (?, ?, ?)';
         
-        db.query(sql, [email, hashedPassword], (err, result) => {
+        db.query(sql, [email, hashedPassword, name || null], (err, result) => {
             if (err) {
                 if (err.code === 'ER_DUP_ENTRY') {
                     return res.status(400).json({ error: 'Email already in use' });
@@ -111,6 +111,37 @@ const authenticateToken = (req, res, next) => {
 // ==========================================
 // 4. PROTECTED API ROUTES
 // ==========================================
+
+// GET Route: Fetch logged-in user's profile and goal settings
+app.get('/api/user/profile', authenticateToken, (req, res) => {
+    const userId = req.user.userId;
+    const sql = 'SELECT id, email, name, weekly_goal_minutes, created_at FROM users WHERE id = ?';
+    db.query(sql, [userId], (err, results) => {
+        if (err) {
+            console.error('❌ Error fetching profile:', err);
+            return res.status(500).json({ error: 'Database error' });
+        }
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+        res.json(results[0]);
+    });
+});
+
+// PUT Route: Update user profile and weekly goal
+app.put('/api/user/profile', authenticateToken, (req, res) => {
+    const userId = req.user.userId;
+    const { name, weekly_goal_minutes } = req.body;
+
+    const sql = 'UPDATE users SET name = COALESCE(?, name), weekly_goal_minutes = COALESCE(?, weekly_goal_minutes) WHERE id = ?';
+    db.query(sql, [name, weekly_goal_minutes, userId], (err, result) => {
+        if (err) {
+            console.error('❌ Error updating profile:', err);
+            return res.status(500).json({ error: 'Database error' });
+        }
+        res.json({ message: '✅ Profile updated successfully!' });
+    });
+});
 
 // GET Route: Fetch ONLY the logged-in user's past workouts
 app.get('/api/workouts', authenticateToken, (req, res) => {
