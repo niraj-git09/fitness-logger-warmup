@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 
 function Login() {
@@ -6,7 +6,15 @@ function Login() {
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'light');
   const navigate = useNavigate();
+
+  const toggleTheme = () => {
+    const next = theme === 'dark' ? 'light' : 'dark';
+    setTheme(next);
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -40,12 +48,39 @@ function Login() {
       maxWidth: '420px',
       margin: '60px auto',
       padding: '36px 32px',
-      backgroundColor: '#ffffff',
+      backgroundColor: 'var(--bg-card)',
       borderRadius: '20px',
-      border: '1px solid #e2e8f0',
-      boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.06)',
-      textAlign: 'center'
+      border: '1px solid var(--border-color)',
+      boxShadow: 'var(--shadow-lg)',
+      textAlign: 'center',
+      position: 'relative',
+      transition: 'background-color 0.3s ease, border-color 0.3s ease'
     }}>
+      {/* Theme Toggle in Login Corner */}
+      <button
+        type="button"
+        onClick={toggleTheme}
+        title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} mode`}
+        style={{
+          position: 'absolute',
+          top: '20px',
+          right: '20px',
+          background: 'var(--bg-card-subtle)',
+          border: '1px solid var(--border-color)',
+          borderRadius: '8px',
+          width: '32px',
+          height: '32px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          cursor: 'pointer',
+          fontSize: '14px',
+          color: 'var(--text-main)'
+        }}
+      >
+        {theme === 'dark' ? '☀️' : '🌙'}
+      </button>
+
       {/* Brand Icon */}
       <div style={{
         width: '54px',
@@ -56,23 +91,24 @@ function Login() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        fontSize: '28px'
+        fontSize: '28px',
+        boxShadow: '0 4px 12px rgba(79, 70, 229, 0.3)'
       }}>
         🏋️
       </div>
 
-      <h2 style={{ fontSize: '24px', fontWeight: '800', color: '#0f172a', margin: '0 0 6px 0' }}>
+      <h2 style={{ fontSize: '24px', fontWeight: '800', color: 'var(--text-main)', margin: '0 0 6px 0' }}>
         Welcome Back
       </h2>
-      <p style={{ color: '#64748b', fontSize: '14px', margin: '0 0 24px 0' }}>
+      <p style={{ color: 'var(--text-muted)', fontSize: '14px', margin: '0 0 24px 0' }}>
         Log in to track your workouts and reach your goals.
       </p>
 
       {errorMessage && (
         <div style={{
-          backgroundColor: '#fef2f2',
-          border: '1px solid #fee2e2',
-          color: '#991b1b',
+          backgroundColor: 'var(--danger-light)',
+          border: '1px solid var(--danger)',
+          color: 'var(--danger-text)',
           padding: '10px 14px',
           borderRadius: '8px',
           fontSize: '13px',
@@ -86,7 +122,7 @@ function Login() {
 
       <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '16px', textAlign: 'left' }}>
         <div>
-          <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>
+          <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: 'var(--text-muted)', marginBottom: '6px' }}>
             Email Address
           </label>
           <input 
@@ -100,7 +136,7 @@ function Login() {
         </div>
 
         <div>
-          <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>
+          <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: 'var(--text-muted)', marginBottom: '6px' }}>
             Password
           </label>
           <input 
@@ -133,9 +169,9 @@ function Login() {
         </button>
       </form>
 
-      <p style={{ marginTop: '24px', fontSize: '14px', color: '#64748b' }}>
+      <p style={{ marginTop: '24px', fontSize: '14px', color: 'var(--text-muted)' }}>
         Don't have an account?{' '}
-        <Link to="/register" style={{ color: '#4f46e5', fontWeight: '600', textDecoration: 'none' }}>
+        <Link to="/register" style={{ color: 'var(--primary)', fontWeight: '600', textDecoration: 'none' }}>
           Create an account
         </Link>
       </p>
@@ -146,10 +182,11 @@ function Login() {
 const authInputStyle = {
   width: '100%',
   padding: '11px 14px',
-  border: '1px solid #cbd5e1',
+  border: '1px solid var(--border-color)',
   borderRadius: '10px',
   fontSize: '14px',
-  backgroundColor: '#ffffff'
+  backgroundColor: 'var(--bg-card)',
+  color: 'var(--text-main)'
 };
 
 export default Login;
