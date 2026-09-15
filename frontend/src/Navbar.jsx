@@ -1,14 +1,30 @@
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-function Navbar({ profile }) {
+function Navbar({ profile, onOpenLogModal }) {
   const navigate = useNavigate();
+
+  // Initialize theme from localStorage or system preference
+  const [theme, setTheme] = useState(() => {
+    const saved = localStorage.getItem('theme');
+    if (saved) return saved;
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  });
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prev => (prev === 'dark' ? 'light' : 'dark'));
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('token');
     navigate('/login');
   };
 
-  // Generate initials from name or email
   const getInitials = () => {
     if (profile?.name) {
       return profile.name.slice(0, 2).toUpperCase();
@@ -27,25 +43,27 @@ function Navbar({ profile }) {
       justifyContent: 'space-between',
       alignItems: 'center',
       padding: '16px 28px',
-      backgroundColor: '#0f172a',
+      backgroundColor: 'var(--navbar-bg)',
       color: '#ffffff',
       borderRadius: '16px',
       marginBottom: '24px',
-      boxShadow: '0 4px 12px rgba(15, 23, 42, 0.15)',
+      boxShadow: '0 8px 20px rgba(0, 0, 0, 0.2)',
       flexWrap: 'wrap',
-      gap: '16px'
+      gap: '16px',
+      transition: 'background-color 0.3s ease'
     }}>
       {/* Brand Identity */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
         <div style={{
-          width: '40px',
-          height: '40px',
-          borderRadius: '10px',
-          backgroundColor: '#4f46e5',
+          width: '42px',
+          height: '42px',
+          borderRadius: '12px',
+          background: 'linear-gradient(135deg, #6366f1, #4f46e5)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          fontSize: '22px'
+          fontSize: '22px',
+          boxShadow: '0 4px 10px rgba(79, 70, 229, 0.3)'
         }}>
           🏋️
         </div>
@@ -60,27 +78,74 @@ function Navbar({ profile }) {
       </div>
 
       {/* User Info & Actions */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '18px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
+        {/* Quick Log Action */}
+        {onOpenLogModal && (
+          <button
+            onClick={onOpenLogModal}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              backgroundColor: '#4f46e5',
+              color: '#ffffff',
+              border: 'none',
+              borderRadius: '9999px',
+              padding: '7px 16px',
+              fontSize: '13px',
+              fontWeight: '600',
+              boxShadow: '0 2px 6px rgba(79, 70, 229, 0.3)',
+              cursor: 'pointer'
+            }}
+          >
+            <span>➕</span>
+            <span>Log Session</span>
+          </button>
+        )}
+
+        {/* Theme Toggle Button */}
+        <button
+          onClick={toggleTheme}
+          title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} mode`}
+          style={{
+            width: '36px',
+            height: '36px',
+            borderRadius: '10px',
+            backgroundColor: 'rgba(255, 255, 255, 0.1)',
+            border: '1px solid rgba(255, 255, 255, 0.15)',
+            color: '#ffffff',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '16px',
+            cursor: 'pointer',
+            transition: 'background-color 0.2s'
+          }}
+        >
+          {theme === 'dark' ? '☀️' : '🌙'}
+        </button>
+
+        {/* Profile Chip */}
         {profile && (
           <div style={{
             display: 'flex',
             alignItems: 'center',
             gap: '10px',
             backgroundColor: 'rgba(255, 255, 255, 0.08)',
-            padding: '6px 14px',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            padding: '5px 12px',
             borderRadius: '9999px'
           }}>
-            {/* Avatar Initials Bubble */}
             <div style={{
-              width: '32px',
-              height: '32px',
+              width: '30px',
+              height: '30px',
               borderRadius: '50%',
               background: 'linear-gradient(135deg, #6366f1, #a855f7)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               fontWeight: '700',
-              fontSize: '12px',
+              fontSize: '11px',
               color: '#ffffff'
             }}>
               {getInitials()}
@@ -100,19 +165,19 @@ function Navbar({ profile }) {
         {/* Log Out Button */}
         <button 
           onClick={handleLogout}
+          title="Sign out of your account"
           style={{
-            padding: '8px 18px',
-            backgroundColor: '#ef4444',
-            color: '#ffffff',
-            border: 'none',
-            borderRadius: '8px',
+            padding: '7px 15px',
+            backgroundColor: 'rgba(239, 68, 68, 0.15)',
+            color: '#f87171',
+            border: '1px solid rgba(239, 68, 68, 0.3)',
+            borderRadius: '10px',
             cursor: 'pointer',
             fontWeight: '600',
             fontSize: '13px',
             display: 'flex',
             alignItems: 'center',
-            gap: '6px',
-            boxShadow: '0 2px 4px rgba(239, 68, 68, 0.2)'
+            gap: '6px'
           }}
         >
           <span>🚪</span>

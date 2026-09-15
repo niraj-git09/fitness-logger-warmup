@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const POPULAR_EXERCISES = [
   { name: 'Running', icon: '🏃' },
@@ -9,13 +9,25 @@ const POPULAR_EXERCISES = [
   { name: 'Walking', icon: '🚶' }
 ];
 
-function WorkoutForm({ onWorkoutAdded }) {
+function WorkoutForm({ onWorkoutAdded, isModal = false, onClose }) {
   const today = new Date().toISOString().split('T')[0];
   const [exerciseType, setExerciseType] = useState('');
   const [duration, setDuration] = useState('');
   const [date, setDate] = useState(today);
   const [statusMessage, setStatusMessage] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Close modal on Escape key
+  useEffect(() => {
+    if (!isModal) return;
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && onClose) {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isModal, onClose]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -43,10 +55,19 @@ function WorkoutForm({ onWorkoutAdded }) {
         setExerciseType('');
         setDuration('');
         setDate(today);
+
         if (onWorkoutAdded) {
           onWorkoutAdded();
         }
-        setTimeout(() => setStatusMessage(null), 3000);
+
+        // Auto-close modal after brief visual confirmation
+        if (isModal && onClose) {
+          setTimeout(() => {
+            onClose();
+          }, 600);
+        } else {
+          setTimeout(() => setStatusMessage(null), 3000);
+        }
       } else {
         const data = await response.json();
         setStatusMessage({ type: 'error', text: `❌ ${data.error || 'Failed to add workout.'}` });
@@ -58,41 +79,71 @@ function WorkoutForm({ onWorkoutAdded }) {
     }
   };
 
-  return (
-    <div style={{
-      width: '100%',
-      maxWidth: '850px',
-      margin: '0 auto',
-      backgroundColor: '#ffffff',
-      borderRadius: '16px',
-      border: '1px solid #e2e8f0',
-      padding: '24px 28px',
-      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)',
-      textAlign: 'left'
-    }}>
+  const formContent = (
+    <div 
+      className={isModal ? 'modal-card' : ''}
+      style={{
+        width: '100%',
+        maxWidth: isModal ? '560px' : '850px',
+        margin: '0 auto',
+        backgroundColor: 'var(--bg-card)',
+        borderRadius: '16px',
+        border: '1px solid var(--border-color)',
+        padding: '24px 28px',
+        boxShadow: isModal ? 'var(--shadow-xl)' : 'var(--shadow-md)',
+        textAlign: 'left',
+        position: 'relative'
+      }}
+      onClick={(e) => e.stopPropagation()}
+    >
+      {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-        <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '700', color: '#0f172a' }}>
-          ⚡ Log a Workout Session
-        </h3>
-        {statusMessage && (
-          <span style={{
-            fontSize: '13px',
-            fontWeight: '600',
-            padding: '4px 12px',
-            borderRadius: '9999px',
-            backgroundColor: statusMessage.type === 'success' ? '#ecfdf5' : '#fef2f2',
-            color: statusMessage.type === 'success' ? '#065f46' : '#991b1b',
-            transition: 'all 0.3s ease'
-          }}>
-            {statusMessage.text}
-          </span>
-        )}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ fontSize: '20px' }}>⚡</span>
+          <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '700', color: 'var(--text-main)' }}>
+            Log a Workout Session
+          </h3>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          {statusMessage && (
+            <span style={{
+              fontSize: '12px',
+              fontWeight: '600',
+              padding: '4px 10px',
+              borderRadius: '9999px',
+              backgroundColor: statusMessage.type === 'success' ? 'var(--success-light)' : 'var(--danger-light)',
+              color: statusMessage.type === 'success' ? 'var(--success-text)' : 'var(--danger-text)'
+            }}>
+              {statusMessage.text}
+            </span>
+          )}
+
+          {isModal && onClose && (
+            <button
+              onClick={onClose}
+              type="button"
+              style={{
+                background: 'none',
+                border: 'none',
+                fontSize: '18px',
+                color: 'var(--text-muted)',
+                cursor: 'pointer',
+                padding: '4px 8px',
+                borderRadius: '6px'
+              }}
+              title="Close modal (Esc)"
+            >
+              ✕
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Fast Selection Chips */}
       <div style={{ marginBottom: '16px' }}>
-        <span style={{ fontSize: '12px', color: '#64748b', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-          Quick Select:
+        <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+          Quick Select Activity:
         </span>
         <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '6px' }}>
           {POPULAR_EXERCISES.map((item) => (
@@ -101,9 +152,9 @@ function WorkoutForm({ onWorkoutAdded }) {
               type="button"
               onClick={() => setExerciseType(item.name)}
               style={{
-                backgroundColor: exerciseType === item.name ? '#eef2ff' : '#f8fafc',
-                border: exerciseType === item.name ? '1px solid #6366f1' : '1px solid #e2e8f0',
-                color: exerciseType === item.name ? '#4338ca' : '#475569',
+                backgroundColor: exerciseType === item.name ? 'var(--primary-light)' : 'var(--bg-card-subtle)',
+                border: exerciseType === item.name ? '1px solid var(--primary)' : '1px solid var(--border-color)',
+                color: exerciseType === item.name ? 'var(--primary)' : 'var(--text-muted)',
                 borderRadius: '9999px',
                 padding: '5px 12px',
                 fontSize: '12px',
@@ -117,16 +168,16 @@ function WorkoutForm({ onWorkoutAdded }) {
         </div>
       </div>
 
-      {/* Main Form Inputs */}
+      {/* Form Fields */}
       <form onSubmit={handleSubmit} style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr)) auto',
-        gap: '12px',
+        gridTemplateColumns: isModal ? '1fr' : 'repeat(auto-fit, minmax(180px, 1fr)) auto',
+        gap: '14px',
         alignItems: 'end'
       }}>
         <div>
-          <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>
-            Exercise Name
+          <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: 'var(--text-muted)', marginBottom: '6px' }}>
+            Exercise Type
           </label>
           <input 
             type="text" 
@@ -139,7 +190,7 @@ function WorkoutForm({ onWorkoutAdded }) {
         </div>
 
         <div>
-          <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>
+          <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: 'var(--text-muted)', marginBottom: '6px' }}>
             Duration (Minutes)
           </label>
           <input 
@@ -155,7 +206,7 @@ function WorkoutForm({ onWorkoutAdded }) {
         </div>
 
         <div>
-          <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: '#475569', marginBottom: '6px' }}>
+          <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: 'var(--text-muted)', marginBottom: '6px' }}>
             Date
           </label>
           <input 
@@ -167,36 +218,69 @@ function WorkoutForm({ onWorkoutAdded }) {
           />
         </div>
 
-        <button 
-          type="submit" 
-          disabled={isSubmitting}
-          style={{
-            backgroundColor: '#4f46e5',
-            color: '#ffffff',
-            border: 'none',
-            borderRadius: '10px',
-            padding: '11px 24px',
-            fontSize: '14px',
-            fontWeight: '600',
-            cursor: isSubmitting ? 'not-allowed' : 'pointer',
-            boxShadow: '0 2px 4px rgba(79, 70, 229, 0.25)',
-            whiteSpace: 'nowrap'
-          }}
-        >
-          {isSubmitting ? 'Saving...' : '💾 Log Session'}
-        </button>
+        <div style={{ display: 'flex', gap: '8px', marginTop: isModal ? '10px' : '0' }}>
+          <button 
+            type="submit" 
+            disabled={isSubmitting}
+            style={{
+              flex: 1,
+              backgroundColor: 'var(--primary)',
+              color: '#ffffff',
+              border: 'none',
+              borderRadius: '10px',
+              padding: '11px 24px',
+              fontSize: '14px',
+              fontWeight: '600',
+              cursor: isSubmitting ? 'not-allowed' : 'pointer',
+              boxShadow: '0 2px 4px rgba(79, 70, 229, 0.25)',
+              whiteSpace: 'nowrap'
+            }}
+          >
+            {isSubmitting ? 'Saving...' : '💾 Save Session'}
+          </button>
+
+          {isModal && onClose && (
+            <button
+              type="button"
+              onClick={onClose}
+              style={{
+                backgroundColor: 'var(--bg-card-subtle)',
+                color: 'var(--text-muted)',
+                border: '1px solid var(--border-color)',
+                borderRadius: '10px',
+                padding: '11px 18px',
+                fontSize: '14px',
+                fontWeight: '600',
+                cursor: 'pointer'
+              }}
+            >
+              Cancel
+            </button>
+          )}
+        </div>
       </form>
     </div>
   );
+
+  if (isModal) {
+    return (
+      <div className="modal-overlay" onClick={onClose}>
+        {formContent}
+      </div>
+    );
+  }
+
+  return formContent;
 }
 
 const inputStyle = {
   width: '100%',
   padding: '10px 14px',
-  border: '1px solid #cbd5e1',
+  border: '1px solid var(--border-color)',
   borderRadius: '10px',
   fontSize: '14px',
-  backgroundColor: '#ffffff'
+  color: 'var(--text-main)',
+  backgroundColor: 'var(--bg-card)'
 };
 
 export default WorkoutForm;

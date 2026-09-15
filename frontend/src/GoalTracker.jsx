@@ -68,21 +68,21 @@ function GoalTracker({ workouts = [], profile, onProfileUpdated }) {
 
   // Get status badge styling
   let badgeText = `🎯 ${remaining} mins to reach goal`;
-  let badgeBg = '#eef2ff';
-  let badgeColor = '#4338ca';
+  let badgeBg = 'var(--primary-light)';
+  let badgeColor = 'var(--primary)';
 
   if (percentage >= 100) {
     badgeText = '🏆 Weekly Goal Crushed!';
-    badgeBg = '#ecfdf5';
-    badgeColor = '#065f46';
+    badgeBg = 'var(--success-light)';
+    badgeColor = 'var(--success-text)';
   } else if (percentage >= 75) {
     badgeText = '⚡ Almost there! Final push!';
-    badgeBg = '#f0fdf4';
-    badgeColor = '#15803d';
+    badgeBg = 'var(--success-light)';
+    badgeColor = 'var(--success-text)';
   } else if (percentage >= 50) {
     badgeText = '🔥 Halfway mark reached!';
-    badgeBg = '#fffbeb';
-    badgeColor = '#b45309';
+    badgeBg = 'var(--warning-light)';
+    badgeColor = 'var(--warning-text)';
   }
 
   return (
@@ -90,12 +90,13 @@ function GoalTracker({ workouts = [], profile, onProfileUpdated }) {
       width: '100%',
       maxWidth: '850px',
       margin: '0 auto',
-      backgroundColor: '#ffffff',
+      backgroundColor: 'var(--bg-card)',
       borderRadius: '16px',
-      border: '1px solid #e2e8f0',
+      border: '1px solid var(--border-color)',
       padding: '24px 28px',
-      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)',
-      textAlign: 'left'
+      boxShadow: 'var(--shadow-sm)',
+      textAlign: 'left',
+      transition: 'background-color 0.3s ease, border-color 0.3s ease'
     }}>
       {/* Top Header Row */}
       <div style={{
@@ -109,11 +110,11 @@ function GoalTracker({ workouts = [], profile, onProfileUpdated }) {
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <span style={{ fontSize: '20px' }}>🎯</span>
-            <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '700', color: '#0f172a' }}>
+            <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '700', color: 'var(--text-main)' }}>
               Weekly Fitness Target
             </h3>
           </div>
-          <span style={{ fontSize: '13px', color: '#64748b' }}>
+          <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
             {monday.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} – {sunday.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
           </span>
         </div>
@@ -136,12 +137,12 @@ function GoalTracker({ workouts = [], profile, onProfileUpdated }) {
               setIsEditingGoal(!isEditingGoal);
             }}
             style={{
-              background: 'none',
-              border: '1px solid #cbd5e1',
+              backgroundColor: 'var(--bg-card-subtle)',
+              border: '1px solid var(--border-color)',
               borderRadius: '8px',
               padding: '6px 12px',
               fontSize: '13px',
-              color: '#475569',
+              color: 'var(--text-main)',
               fontWeight: '500',
               cursor: 'pointer'
             }}
@@ -154,8 +155,8 @@ function GoalTracker({ workouts = [], profile, onProfileUpdated }) {
       {/* Inline Goal Editor */}
       {isEditingGoal && (
         <form onSubmit={handleSaveGoal} style={{
-          backgroundColor: '#f8fafc',
-          border: '1px solid #e2e8f0',
+          backgroundColor: 'var(--bg-card-subtle)',
+          border: '1px solid var(--border-color)',
           borderRadius: '10px',
           padding: '12px 16px',
           marginBottom: '16px',
@@ -164,7 +165,7 @@ function GoalTracker({ workouts = [], profile, onProfileUpdated }) {
           gap: '12px',
           flexWrap: 'wrap'
         }}>
-          <label style={{ fontSize: '13px', fontWeight: '600', color: '#334155' }}>
+          <label style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-main)' }}>
             Set Target Minutes:
           </label>
           <input
@@ -175,10 +176,12 @@ function GoalTracker({ workouts = [], profile, onProfileUpdated }) {
             onChange={(e) => setTargetMinutes(e.target.value)}
             style={{
               padding: '6px 12px',
-              border: '1px solid #cbd5e1',
+              border: '1px solid var(--border-color)',
               borderRadius: '6px',
               width: '100px',
-              fontSize: '14px'
+              fontSize: '14px',
+              backgroundColor: 'var(--bg-card)',
+              color: 'var(--text-main)'
             }}
             required
           />
@@ -186,7 +189,7 @@ function GoalTracker({ workouts = [], profile, onProfileUpdated }) {
             type="submit"
             disabled={isSaving}
             style={{
-              backgroundColor: '#4f46e5',
+              backgroundColor: 'var(--primary)',
               color: '#ffffff',
               border: 'none',
               borderRadius: '6px',
@@ -198,7 +201,7 @@ function GoalTracker({ workouts = [], profile, onProfileUpdated }) {
           >
             {isSaving ? 'Saving...' : 'Save'}
           </button>
-          <small style={{ color: '#64748b' }}>
+          <small style={{ color: 'var(--text-muted)' }}>
             (WHO guidelines suggest 150+ minutes of aerobic activity per week)
           </small>
         </form>
@@ -207,14 +210,14 @@ function GoalTracker({ workouts = [], profile, onProfileUpdated }) {
       {/* Progress Stats Numbers */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '8px' }}>
         <div>
-          <span style={{ fontSize: '28px', fontWeight: '800', color: '#0f172a' }}>
+          <span style={{ fontSize: '28px', fontWeight: '800', color: 'var(--text-main)' }}>
             {weeklyMinutes}
           </span>
-          <span style={{ fontSize: '16px', color: '#64748b', marginLeft: '4px' }}>
+          <span style={{ fontSize: '16px', color: 'var(--text-muted)', marginLeft: '4px' }}>
             / {goal} mins
           </span>
         </div>
-        <span style={{ fontSize: '18px', fontWeight: '700', color: percentage >= 100 ? '#10b981' : '#4f46e5' }}>
+        <span style={{ fontSize: '18px', fontWeight: '700', color: percentage >= 100 ? 'var(--success)' : 'var(--primary)' }}>
           {percentage}%
         </span>
       </div>
@@ -223,7 +226,8 @@ function GoalTracker({ workouts = [], profile, onProfileUpdated }) {
       <div style={{
         width: '100%',
         height: '14px',
-        backgroundColor: '#e2e8f0',
+        backgroundColor: 'var(--bg-card-subtle)',
+        border: '1px solid var(--border-color)',
         borderRadius: '9999px',
         overflow: 'hidden'
       }}>
@@ -243,7 +247,7 @@ function GoalTracker({ workouts = [], profile, onProfileUpdated }) {
         justifyContent: 'space-between',
         marginTop: '10px',
         fontSize: '12px',
-        color: '#94a3b8'
+        color: 'var(--text-light)'
       }}>
         <span>{thisWeekWorkouts.length} session{thisWeekWorkouts.length === 1 ? '' : 's'} logged this week</span>
         <span>{remaining === 0 ? 'Goal completed! 🌟' : `${remaining} mins to 100%`}</span>

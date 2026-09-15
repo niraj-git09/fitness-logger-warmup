@@ -19,17 +19,18 @@ function WorkoutCharts({ workouts = [] }) {
         maxWidth: '850px',
         padding: '36px 24px',
         margin: '0 auto',
-        backgroundColor: '#ffffff',
+        backgroundColor: 'var(--bg-card)',
         borderRadius: '16px',
-        border: '2px dashed #cbd5e1',
-        textAlign: 'center'
+        border: '2px dashed var(--border-color)',
+        textAlign: 'center',
+        transition: 'background-color 0.3s ease, border-color 0.3s ease'
       }}>
         <div style={{ fontSize: '32px', marginBottom: '8px' }}>📊</div>
-        <h3 style={{ color: '#1e293b', fontSize: '18px', fontWeight: '700', margin: '0 0 6px 0' }}>
+        <h3 style={{ color: 'var(--text-main)', fontSize: '18px', fontWeight: '700', margin: '0 0 6px 0' }}>
           Workout Analytics
         </h3>
-        <p style={{ color: '#64748b', fontSize: '14px', margin: 0 }}>
-          No session data recorded yet. Log your first workout above to visualize your progress!
+        <p style={{ color: 'var(--text-muted)', fontSize: '14px', margin: 0 }}>
+          No session data recorded yet. Log your first workout to visualize your progress!
         </p>
       </div>
     );
@@ -94,17 +95,17 @@ function WorkoutCharts({ workouts = [] }) {
         <div style={chartContainerStyle}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
             <span style={{ fontSize: '18px' }}>📈</span>
-            <h4 style={{ margin: 0, color: '#0f172a', fontSize: '16px', fontWeight: '700' }}>
+            <h4 style={{ margin: 0, color: 'var(--text-main)', fontSize: '16px', fontWeight: '700' }}>
               Duration History (Minutes)
             </h4>
           </div>
           <ResponsiveContainer width="100%" height={260}>
             <LineChart data={timelineData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-              <XAxis dataKey="date" stroke="#94a3b8" tick={{ fontSize: 11 }} />
-              <YAxis stroke="#94a3b8" tick={{ fontSize: 11 }} />
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" />
+              <XAxis dataKey="date" stroke="var(--text-muted)" tick={{ fontSize: 11 }} />
+              <YAxis stroke="var(--text-muted)" tick={{ fontSize: 11 }} />
               <Tooltip 
-                contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}
+                contentStyle={{ backgroundColor: 'var(--bg-card)', borderRadius: '8px', border: '1px solid var(--border-color)', color: 'var(--text-main)' }}
                 formatter={(value) => [`${value} mins`, 'Duration']}
                 labelFormatter={(label) => `Date: ${label}`}
               />
@@ -113,9 +114,9 @@ function WorkoutCharts({ workouts = [] }) {
                 type="monotone" 
                 dataKey="duration" 
                 name="Duration (mins)" 
-                stroke="#4f46e5" 
+                stroke="var(--primary)" 
                 strokeWidth={3} 
-                dot={{ r: 4, fill: '#4f46e5' }} 
+                dot={{ r: 4, fill: 'var(--primary)' }} 
                 activeDot={{ r: 6 }} 
               />
             </LineChart>
@@ -126,24 +127,24 @@ function WorkoutCharts({ workouts = [] }) {
         <div style={chartContainerStyle}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
             <span style={{ fontSize: '18px' }}>🏋️</span>
-            <h4 style={{ margin: 0, color: '#0f172a', fontSize: '16px', fontWeight: '700' }}>
+            <h4 style={{ margin: 0, color: 'var(--text-main)', fontSize: '16px', fontWeight: '700' }}>
               Minutes by Activity
             </h4>
           </div>
           <ResponsiveContainer width="100%" height={260}>
             <BarChart data={categoryData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-              <XAxis dataKey="exercise" stroke="#94a3b8" tick={{ fontSize: 11 }} />
-              <YAxis stroke="#94a3b8" tick={{ fontSize: 11 }} />
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" />
+              <XAxis dataKey="exercise" stroke="var(--text-muted)" tick={{ fontSize: 11 }} />
+              <YAxis stroke="var(--text-muted)" tick={{ fontSize: 11 }} />
               <Tooltip 
-                contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}
+                contentStyle={{ backgroundColor: 'var(--bg-card)', borderRadius: '8px', border: '1px solid var(--border-color)', color: 'var(--text-main)' }}
                 formatter={(value) => [`${value} mins`, 'Total Time']}
               />
               <Legend wrapperStyle={{ fontSize: '12px' }} />
               <Bar 
                 dataKey="totalMinutes" 
                 name="Total Minutes" 
-                fill="#10b981" 
+                fill="var(--success)" 
                 radius={[6, 6, 0, 0]} 
               />
             </BarChart>
@@ -155,18 +156,19 @@ function WorkoutCharts({ workouts = [] }) {
 }
 
 const statCardStyle = {
-  backgroundColor: '#ffffff',
-  border: '1px solid #e2e8f0',
+  backgroundColor: 'var(--bg-card)',
+  border: '1px solid var(--border-color)',
   borderRadius: '16px',
   padding: '20px',
-  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)',
-  textAlign: 'center'
+  boxShadow: 'var(--shadow-sm)',
+  textAlign: 'center',
+  transition: 'background-color 0.3s ease, border-color 0.3s ease'
 };
 
 const statNumberStyle = {
   fontSize: '26px',
   fontWeight: '800',
-  color: '#4f46e5',
+  color: 'var(--primary)',
   marginBottom: '4px',
   letterSpacing: '-0.5px'
 };
@@ -174,17 +176,18 @@ const statNumberStyle = {
 const statLabelStyle = {
   fontSize: '12px',
   fontWeight: '600',
-  color: '#64748b',
+  color: 'var(--text-muted)',
   textTransform: 'uppercase',
   letterSpacing: '0.5px'
 };
 
 const chartContainerStyle = {
-  backgroundColor: '#ffffff',
-  border: '1px solid #e2e8f0',
+  backgroundColor: 'var(--bg-card)',
+  border: '1px solid var(--border-color)',
   borderRadius: '16px',
   padding: '22px',
-  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)'
+  boxShadow: 'var(--shadow-sm)',
+  transition: 'background-color 0.3s ease, border-color 0.3s ease'
 };
 
 export default WorkoutCharts;
