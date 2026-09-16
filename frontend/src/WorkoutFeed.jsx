@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { calculateCalories } from './utils/calorieUtils';
 
 const CATEGORIES = ['All', 'Running', 'Weight Training', 'Cycling', 'Yoga', 'Swimming', 'Walking'];
 
@@ -432,7 +433,7 @@ function WorkoutFeed({ workouts: propWorkouts, loading: propLoading, onWorkoutCh
                     <small style={{ color: 'var(--text-muted)' }}>Logged on: {formatDate(workout.date_logged)}</small>
                   </div>
                   
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                     <span style={{
                       backgroundColor: 'var(--primary-light)',
                       color: 'var(--primary)',
@@ -442,6 +443,17 @@ function WorkoutFeed({ workouts: propWorkouts, loading: propLoading, onWorkoutCh
                       fontSize: '13px'
                     }}>
                       ⏱️ {workout.duration_minutes} mins
+                    </span>
+
+                    <span style={{
+                      backgroundColor: 'var(--warning-light)',
+                      color: 'var(--warning-text)',
+                      fontWeight: '700',
+                      padding: '5px 12px',
+                      borderRadius: '9999px',
+                      fontSize: '13px'
+                    }}>
+                      🔥 {calculateCalories(workout.exercise_type, workout.duration_minutes)} kcal
                     </span>
 
                     <button 

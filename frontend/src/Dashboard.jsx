@@ -4,6 +4,8 @@ import GoalTracker from './GoalTracker';
 import WorkoutForm from './WorkoutForm';
 import WorkoutCharts from './WorkoutCharts';
 import WorkoutFeed from './WorkoutFeed';
+import StreakTracker from './StreakTracker';
+import Achievements from './Achievements';
 
 function Dashboard() {
   const [workouts, setWorkouts] = useState([]);
@@ -116,6 +118,12 @@ function Dashboard() {
           profile={profile} 
           onProfileUpdated={fetchProfile} 
         />
+
+        {/* Gamification: Streaks & Consistency */}
+        <StreakTracker workouts={workouts} />
+
+        {/* Milestone Badges & Achievements */}
+        <Achievements workouts={workouts} profile={profile} />
 
         {/* Analytics & Charts */}
         <WorkoutCharts workouts={workouts} />

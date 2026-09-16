@@ -10,6 +10,7 @@ import {
   CartesianGrid,
   Legend
 } from 'recharts';
+import { calculateTotalCalories } from './utils/calorieUtils';
 
 function WorkoutCharts({ workouts = [] }) {
   if (!workouts || workouts.length === 0) {
@@ -40,6 +41,7 @@ function WorkoutCharts({ workouts = [] }) {
   const totalMinutes = workouts.reduce((sum, w) => sum + Number(w.duration_minutes || 0), 0);
   const totalSessions = workouts.length;
   const avgDuration = Math.round(totalMinutes / totalSessions);
+  const totalCalories = calculateTotalCalories(workouts);
 
   // 2. Timeline Data: sorted chronologically
   const timelineData = [...workouts]
@@ -82,6 +84,12 @@ function WorkoutCharts({ workouts = [] }) {
         <div style={statCardStyle}>
           <div style={statNumberStyle}>{avgDuration} <span style={{ fontSize: '16px', fontWeight: '600' }}>mins</span></div>
           <div style={statLabelStyle}>Average Session</div>
+        </div>
+        <div style={statCardStyle}>
+          <div style={{ ...statNumberStyle, color: 'var(--warning)' }}>
+            🔥 {totalCalories.toLocaleString()} <span style={{ fontSize: '16px', fontWeight: '600' }}>kcal</span>
+          </div>
+          <div style={statLabelStyle}>Est. Calories Burned</div>
         </div>
       </div>
 
