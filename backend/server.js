@@ -160,16 +160,18 @@ app.get('/api/workouts', authenticateToken, (req, res) => {
 });
 
 // POST Route: Save a new workout tied to the logged-in user
-// POST Route: Save a new workout tied to the logged-in user
 app.post('/api/workouts', authenticateToken, (req, res) => {
-    // We added date_logged back into the destructuring here
-    const { exercise_type, duration_minutes, date_logged } = req.body;
+    const { exercise_type, duration_minutes, date_logged, notes, intensity } = req.body;
     const userId = req.user.userId; 
     
-    // We added date_logged back into the SQL query here
-    const sql = 'INSERT INTO workouts (exercise_type, duration_minutes, date_logged, user_id) VALUES (?, ?, ?, ?)';
+    const validIntensity = ['low', 'medium', 'high'].includes((intensity || '').toLowerCase())
+        ? intensity.toLowerCase()
+        : 'medium';
+    const notesValue = notes && typeof notes === 'string' && notes.trim() !== '' ? notes.trim() : null;
+
+    const sql = 'INSERT INTO workouts (exercise_type, duration_minutes, date_logged, notes, intensity, user_id) VALUES (?, ?, ?, ?, ?, ?)';
     
-    db.query(sql, [exercise_type, duration_minutes, date_logged, userId], (err, result) => {
+    db.query(sql, [exercise_type, duration_minutes, date_logged, notesValue, validIntensity, userId], (err, result) => {
         if (err) {
             console.error('❌ Error saving workout:', err);
             return res.status(500).json({ error: 'Database error' });
@@ -203,10 +205,15 @@ app.delete('/api/workouts/:id', authenticateToken, (req, res) => {
 app.put('/api/workouts/:id', authenticateToken, (req, res) => {
     const workoutId = req.params.id;
     const userId = req.user.userId;
-    const { exercise_type, duration_minutes, date_logged } = req.body;
+    const { exercise_type, duration_minutes, date_logged, notes, intensity } = req.body;
 
-    const sql = 'UPDATE workouts SET exercise_type = ?, duration_minutes = ?, date_logged = ? WHERE id = ? AND user_id = ?';
-    db.query(sql, [exercise_type, duration_minutes, date_logged, workoutId, userId], (err, result) => {
+    const validIntensity = intensity && ['low', 'medium', 'high'].includes(intensity.toLowerCase())
+        ? intensity.toLowerCase()
+        : 'medium';
+    const notesValue = notes && typeof notes === 'string' && notes.trim() !== '' ? notes.trim() : null;
+
+    const sql = 'UPDATE workouts SET exercise_type = ?, duration_minutes = ?, date_logged = ?, notes = ?, intensity = ? WHERE id = ? AND user_id = ?';
+    db.query(sql, [exercise_type, duration_minutes, date_logged, notesValue, validIntensity, workoutId, userId], (err, result) => {
         if (err) {
             console.error('❌ Error updating workout:', err);
             return res.status(500).json({ error: 'Database error' });

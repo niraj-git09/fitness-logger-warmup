@@ -162,3 +162,43 @@ input:-webkit-autofill:focus {
 .modal-card {
   animation: modalContentZoom 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
+
+/* Dashboard Professional Layout & Responsive Grids */
+.dashboard-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 24px 32px 80px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 26px;
+}
+
+.dashboard-main-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.8fr) minmax(360px, 1.2fr);
+  gap: 28px;
+  align-items: start;
+}
+
+@media (max-width: 1120px) {
+  .dashboard-main-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}
+
+@media (max-width: 640px) {
+  .dashboard-container {
+    padding: 16px 14px 60px;
+  }
+  .kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+}

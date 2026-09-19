@@ -12,14 +12,12 @@ import {
 } from 'recharts';
 import { calculateTotalCalories } from './utils/calorieUtils';
 
-function WorkoutCharts({ workouts = [] }) {
+function WorkoutCharts({ workouts = [], hideSummaryCards = false }) {
   if (!workouts || workouts.length === 0) {
     return (
       <div style={{
         width: '100%',
-        maxWidth: '850px',
         padding: '36px 24px',
-        margin: '0 auto',
         backgroundColor: 'var(--bg-card)',
         borderRadius: '16px',
         border: '2px dashed var(--border-color)',
@@ -65,33 +63,35 @@ function WorkoutCharts({ workouts = [] }) {
   const categoryData = Object.values(categoryMap);
 
   return (
-    <div style={{ width: '100%', maxWidth: '850px', margin: '0 auto' }}>
-      {/* Quick Summary Cards */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
-        gap: '16px',
-        marginBottom: '20px'
-      }}>
-        <div style={statCardStyle}>
-          <div style={statNumberStyle}>{totalSessions}</div>
-          <div style={statLabelStyle}>Total Sessions</div>
-        </div>
-        <div style={statCardStyle}>
-          <div style={statNumberStyle}>{totalMinutes} <span style={{ fontSize: '16px', fontWeight: '600' }}>mins</span></div>
-          <div style={statLabelStyle}>Total Active Time</div>
-        </div>
-        <div style={statCardStyle}>
-          <div style={statNumberStyle}>{avgDuration} <span style={{ fontSize: '16px', fontWeight: '600' }}>mins</span></div>
-          <div style={statLabelStyle}>Average Session</div>
-        </div>
-        <div style={statCardStyle}>
-          <div style={{ ...statNumberStyle, color: 'var(--warning)' }}>
-            🔥 {totalCalories.toLocaleString()} <span style={{ fontSize: '16px', fontWeight: '600' }}>kcal</span>
+    <div style={{ width: '100%' }}>
+      {/* Quick Summary Cards (shown if not handled by top dashboard bar) */}
+      {!hideSummaryCards && (
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+          gap: '16px',
+          marginBottom: '20px'
+        }}>
+          <div style={statCardStyle}>
+            <div style={statNumberStyle}>{totalSessions}</div>
+            <div style={statLabelStyle}>Total Sessions</div>
           </div>
-          <div style={statLabelStyle}>Est. Calories Burned</div>
+          <div style={statCardStyle}>
+            <div style={statNumberStyle}>{totalMinutes} <span style={{ fontSize: '16px', fontWeight: '600' }}>mins</span></div>
+            <div style={statLabelStyle}>Total Active Time</div>
+          </div>
+          <div style={statCardStyle}>
+            <div style={statNumberStyle}>{avgDuration} <span style={{ fontSize: '16px', fontWeight: '600' }}>mins</span></div>
+            <div style={statLabelStyle}>Average Session</div>
+          </div>
+          <div style={statCardStyle}>
+            <div style={{ ...statNumberStyle, color: 'var(--warning)' }}>
+              🔥 {totalCalories.toLocaleString()} <span style={{ fontSize: '16px', fontWeight: '600' }}>kcal</span>
+            </div>
+            <div style={statLabelStyle}>Est. Calories Burned</div>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Charts Grid */}
       <div style={{

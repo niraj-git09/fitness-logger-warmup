@@ -21,7 +21,7 @@ const ProtectedRoute = ({ children }) => {
 function App() {
   return (
     <Router>
-      <div style={{ padding: '20px', fontFamily: 'sans-serif', textAlign: 'center' }}>
+      <div style={{ minHeight: '100vh', width: '100%', boxSizing: 'border-box' }}>
         <Routes>
           <Route path="/" element={<Navigate to="/login" replace />} />
           <Route path="/login" element={<Login />} />

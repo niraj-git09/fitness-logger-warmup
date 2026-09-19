@@ -10,6 +10,7 @@ function WorkoutFeed({ workouts: propWorkouts, loading: propLoading, onWorkoutCh
   // Filter & Search states
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [selectedIntensity, setSelectedIntensity] = useState('All'); // 'All', 'low', 'medium', 'high'
   const [timeFilter, setTimeFilter] = useState('all'); // 'all', 'week', 'month'
   const [sortBy, setSortBy] = useState('newest'); // 'newest', 'oldest', 'duration_desc', 'duration_asc'
 
@@ -18,6 +19,8 @@ function WorkoutFeed({ workouts: propWorkouts, loading: propLoading, onWorkoutCh
   const [editExercise, setEditExercise] = useState('');
   const [editDuration, setEditDuration] = useState('');
   const [editDate, setEditDate] = useState('');
+  const [editIntensity, setEditIntensity] = useState('medium');
+  const [editNotes, setEditNotes] = useState('');
 
   const isControlled = propWorkouts !== undefined;
   const rawWorkouts = isControlled ? propWorkouts : internalWorkouts;
@@ -66,10 +69,13 @@ function WorkoutFeed({ workouts: propWorkouts, loading: propLoading, onWorkoutCh
   const filteredWorkouts = useMemo(() => {
     let result = [...rawWorkouts];
 
-    // 1. Text Search Filter
+    // 1. Text Search Filter (Matches exercise name OR notes)
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase().trim();
-      result = result.filter(w => (w.exercise_type || '').toLowerCase().includes(q));
+      result = result.filter(w => 
+        (w.exercise_type || '').toLowerCase().includes(q) ||
+        (w.notes || '').toLowerCase().includes(q)
+      );
     }
 
     // 2. Category Filter
@@ -80,7 +86,12 @@ function WorkoutFeed({ workouts: propWorkouts, loading: propLoading, onWorkoutCh
       });
     }
 
-    // 3. Time Filter
+    // 3. Intensity Filter
+    if (selectedIntensity !== 'All') {
+      result = result.filter(w => (w.intensity || 'medium').toLowerCase() === selectedIntensity.toLowerCase());
+    }
+
+    // 4. Time Filter
     if (timeFilter !== 'all') {
       const now = new Date();
       if (timeFilter === 'week') {
@@ -97,7 +108,7 @@ function WorkoutFeed({ workouts: propWorkouts, loading: propLoading, onWorkoutCh
       }
     }
 
-    // 4. Sorting
+    // 5. Sorting
     result.sort((a, b) => {
       if (sortBy === 'newest') return new Date(b.date_logged) - new Date(a.date_logged);
       if (sortBy === 'oldest') return new Date(a.date_logged) - new Date(b.date_logged);
@@ -107,13 +118,14 @@ function WorkoutFeed({ workouts: propWorkouts, loading: propLoading, onWorkoutCh
     });
 
     return result;
-  }, [rawWorkouts, searchQuery, selectedCategory, timeFilter, sortBy]);
+  }, [rawWorkouts, searchQuery, selectedCategory, selectedIntensity, timeFilter, sortBy]);
 
-  const hasActiveFilters = searchQuery || selectedCategory !== 'All' || timeFilter !== 'all' || sortBy !== 'newest';
+  const hasActiveFilters = searchQuery || selectedCategory !== 'All' || selectedIntensity !== 'All' || timeFilter !== 'all' || sortBy !== 'newest';
 
   const resetFilters = () => {
     setSearchQuery('');
     setSelectedCategory('All');
+    setSelectedIntensity('All');
     setTimeFilter('all');
     setSortBy('newest');
   };
@@ -146,6 +158,8 @@ function WorkoutFeed({ workouts: propWorkouts, loading: propLoading, onWorkoutCh
     setEditExercise(workout.exercise_type);
     setEditDuration(workout.duration_minutes);
     setEditDate(formatDate(workout.date_logged));
+    setEditIntensity(workout.intensity || 'medium');
+    setEditNotes(workout.notes || '');
   };
 
   const cancelEdit = () => {
@@ -164,7 +178,9 @@ function WorkoutFeed({ workouts: propWorkouts, loading: propLoading, onWorkoutCh
         body: JSON.stringify({
           exercise_type: editExercise,
           duration_minutes: editDuration,
-          date_logged: editDate
+          date_logged: editDate,
+          intensity: editIntensity,
+          notes: editNotes
         })
       });
 
@@ -180,8 +196,52 @@ function WorkoutFeed({ workouts: propWorkouts, loading: propLoading, onWorkoutCh
     }
   };
 
+  const renderIntensityBadge = (intensity) => {
+    const norm = (intensity || 'medium').toLowerCase();
+    if (norm === 'high') {
+      return (
+        <span style={{
+          backgroundColor: 'var(--danger-light)',
+          color: 'var(--danger-text)',
+          fontWeight: '700',
+          padding: '5px 11px',
+          borderRadius: '9999px',
+          fontSize: '12px'
+        }}>
+          🔴 High
+        </span>
+      );
+    }
+    if (norm === 'low') {
+      return (
+        <span style={{
+          backgroundColor: 'var(--success-light)',
+          color: 'var(--success-text)',
+          fontWeight: '700',
+          padding: '5px 11px',
+          borderRadius: '9999px',
+          fontSize: '12px'
+        }}>
+          🟢 Low
+        </span>
+      );
+    }
+    return (
+      <span style={{
+        backgroundColor: 'var(--warning-light)',
+        color: 'var(--warning-text)',
+        fontWeight: '700',
+        padding: '5px 11px',
+        borderRadius: '9999px',
+        fontSize: '12px'
+      }}>
+        🟡 Moderate
+      </span>
+    );
+  };
+
   return (
-    <div style={{ width: '100%', maxWidth: '850px', margin: '0 auto', textAlign: 'left' }}>
+    <div style={{ width: '100%', textAlign: 'left' }}>
       {/* Feed Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '10px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -231,15 +291,15 @@ function WorkoutFeed({ workouts: propWorkouts, loading: propLoading, onWorkoutCh
         boxShadow: 'var(--shadow-sm)'
       }}>
         {/* Search Bar & Dropdowns Row */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px', marginBottom: '14px' }}>
-          {/* Live Search Input */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: '12px', marginBottom: '14px' }}>
+          {/* Live Search Input (Exercise or Notes) */}
           <div style={{ position: 'relative' }}>
             <span style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', fontSize: '14px', color: 'var(--text-muted)' }}>
               🔍
             </span>
             <input 
-              type="text"
-              placeholder="Search exercise..."
+              type="text" 
+              placeholder="Search exercise or notes..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               style={{
@@ -281,6 +341,20 @@ function WorkoutFeed({ workouts: propWorkouts, loading: propLoading, onWorkoutCh
               <option value="all">📅 All Dates</option>
               <option value="week">📅 This Week</option>
               <option value="month">📅 This Month</option>
+            </select>
+          </div>
+
+          {/* Intensity Filter */}
+          <div>
+            <select
+              value={selectedIntensity}
+              onChange={(e) => setSelectedIntensity(e.target.value)}
+              style={selectStyle}
+            >
+              <option value="All">⚡ All Intensities</option>
+              <option value="high">🔴 High Intensity</option>
+              <option value="medium">🟡 Moderate Intensity</option>
+              <option value="low">🟢 Low / Recovery</option>
             </select>
           </div>
 
@@ -408,8 +482,24 @@ function WorkoutFeed({ workouts: propWorkouts, loading: propLoading, onWorkoutCh
                       style={editInputStyle}
                       required
                     />
+                    <select
+                      value={editIntensity}
+                      onChange={(e) => setEditIntensity(e.target.value)}
+                      style={{ ...editInputStyle, width: '135px', cursor: 'pointer' }}
+                    >
+                      <option value="low">🟢 Low</option>
+                      <option value="medium">🟡 Moderate</option>
+                      <option value="high">🔴 High</option>
+                    </select>
                   </div>
-                  <div style={{ display: 'flex', gap: '8px', marginTop: '5px' }}>
+                  <input 
+                    type="text" 
+                    value={editNotes} 
+                    onChange={(e) => setEditNotes(e.target.value)} 
+                    placeholder="Session notes (optional)..."
+                    style={{ ...editInputStyle, width: '100%' }}
+                  />
+                  <div style={{ display: 'flex', gap: '8px', marginTop: '2px' }}>
                     <button 
                       onClick={() => handleSaveEdit(workout.id)}
                       style={saveBtnStyle}
@@ -426,52 +516,72 @@ function WorkoutFeed({ workouts: propWorkouts, loading: propLoading, onWorkoutCh
                 </div>
               ) : (
                 /* Standard Card View */
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-                  <div>
-                    <strong style={{ fontSize: '16px', color: 'var(--text-main)' }}>{workout.exercise_type}</strong>
-                    <br />
-                    <small style={{ color: 'var(--text-muted)' }}>Logged on: {formatDate(workout.date_logged)}</small>
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+                    <div>
+                      <strong style={{ fontSize: '16px', color: 'var(--text-main)' }}>{workout.exercise_type}</strong>
+                      <br />
+                      <small style={{ color: 'var(--text-muted)' }}>Logged on: {formatDate(workout.date_logged)}</small>
+                    </div>
+                    
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                      <span style={{
+                        backgroundColor: 'var(--primary-light)',
+                        color: 'var(--primary)',
+                        fontWeight: '700',
+                        padding: '5px 12px',
+                        borderRadius: '9999px',
+                        fontSize: '13px'
+                      }}>
+                        ⏱️ {workout.duration_minutes} mins
+                      </span>
+
+                      <span style={{
+                        backgroundColor: 'var(--warning-light)',
+                        color: 'var(--warning-text)',
+                        fontWeight: '700',
+                        padding: '5px 12px',
+                        borderRadius: '9999px',
+                        fontSize: '13px'
+                      }}>
+                        🔥 {calculateCalories(workout.exercise_type, workout.duration_minutes)} kcal
+                      </span>
+
+                      {renderIntensityBadge(workout.intensity)}
+
+                      <button 
+                        onClick={() => startEdit(workout)}
+                        title="Edit workout session"
+                        style={actionBtnStyle}
+                      >
+                        ✏️ Edit
+                      </button>
+
+                      <button 
+                        onClick={() => handleDelete(workout.id)}
+                        title="Delete workout session"
+                        style={{ ...actionBtnStyle, color: 'var(--danger)', borderColor: 'var(--danger-light)' }}
+                      >
+                        🗑️ Delete
+                      </button>
+                    </div>
                   </div>
-                  
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                    <span style={{
-                      backgroundColor: 'var(--primary-light)',
-                      color: 'var(--primary)',
-                      fontWeight: '700',
-                      padding: '5px 12px',
-                      borderRadius: '9999px',
-                      fontSize: '13px'
+
+                  {workout.notes && (
+                    <div style={{
+                      marginTop: '10px',
+                      padding: '8px 12px',
+                      backgroundColor: 'var(--bg-card-subtle)',
+                      borderRadius: '8px',
+                      fontSize: '13px',
+                      color: 'var(--text-muted)',
+                      borderLeft: '3px solid var(--primary)',
+                      lineHeight: '1.4'
                     }}>
-                      ⏱️ {workout.duration_minutes} mins
-                    </span>
-
-                    <span style={{
-                      backgroundColor: 'var(--warning-light)',
-                      color: 'var(--warning-text)',
-                      fontWeight: '700',
-                      padding: '5px 12px',
-                      borderRadius: '9999px',
-                      fontSize: '13px'
-                    }}>
-                      🔥 {calculateCalories(workout.exercise_type, workout.duration_minutes)} kcal
-                    </span>
-
-                    <button 
-                      onClick={() => startEdit(workout)}
-                      title="Edit workout session"
-                      style={actionBtnStyle}
-                    >
-                      ✏️ Edit
-                    </button>
-
-                    <button 
-                      onClick={() => handleDelete(workout.id)}
-                      title="Delete workout session"
-                      style={{ ...actionBtnStyle, color: 'var(--danger)', borderColor: 'var(--danger-light)' }}
-                    >
-                      🗑️ Delete
-                    </button>
-                  </div>
+                      <span style={{ marginRight: '6px' }}>💬</span>
+                      <em>{workout.notes}</em>
+                    </div>
+                  )}
                 </div>
               )}
             </li>

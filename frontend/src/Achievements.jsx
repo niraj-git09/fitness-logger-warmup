@@ -149,12 +149,10 @@ function Achievements({ workouts = [], profile }) {
   return (
     <div style={{
       width: '100%',
-      maxWidth: '850px',
-      margin: '0 auto',
       backgroundColor: 'var(--bg-card)',
       borderRadius: '16px',
       border: '1px solid var(--border-color)',
-      padding: '24px 28px',
+      padding: '22px 24px',
       boxShadow: 'var(--shadow-sm)',
       textAlign: 'left',
       transition: 'background-color 0.3s ease, border-color 0.3s ease'

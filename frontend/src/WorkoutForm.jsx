@@ -14,6 +14,8 @@ function WorkoutForm({ onWorkoutAdded, isModal = false, onClose }) {
   const [exerciseType, setExerciseType] = useState('');
   const [duration, setDuration] = useState('');
   const [date, setDate] = useState(today);
+  const [intensity, setIntensity] = useState('medium');
+  const [notes, setNotes] = useState('');
   const [statusMessage, setStatusMessage] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -46,7 +48,9 @@ function WorkoutForm({ onWorkoutAdded, isModal = false, onClose }) {
         body: JSON.stringify({ 
           exercise_type: exerciseType, 
           duration_minutes: duration,
-          date_logged: date
+          date_logged: date,
+          intensity: intensity,
+          notes: notes
         }),
       });
 
@@ -55,6 +59,8 @@ function WorkoutForm({ onWorkoutAdded, isModal = false, onClose }) {
         setExerciseType('');
         setDuration('');
         setDate(today);
+        setIntensity('medium');
+        setNotes('');
 
         if (onWorkoutAdded) {
           onWorkoutAdded();
@@ -214,6 +220,59 @@ function WorkoutForm({ onWorkoutAdded, isModal = false, onClose }) {
             value={date} 
             onChange={(e) => setDate(e.target.value)} 
             required 
+            style={inputStyle}
+          />
+        </div>
+
+        {/* Workout Intensity Selector */}
+        <div>
+          <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: 'var(--text-muted)', marginBottom: '6px' }}>
+            Intensity Level
+          </label>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            {[
+              { value: 'low', label: '🟢 Low', sub: 'Easy / Recovery' },
+              { value: 'medium', label: '🟡 Moderate', sub: 'Steady Pace' },
+              { value: 'high', label: '🔴 High', sub: 'Peak Effort' }
+            ].map((lvl) => (
+              <button
+                key={lvl.value}
+                type="button"
+                onClick={() => setIntensity(lvl.value)}
+                style={{
+                  flex: 1,
+                  padding: '7px 8px',
+                  borderRadius: '8px',
+                  border: intensity === lvl.value ? '2px solid var(--primary)' : '1px solid var(--border-color)',
+                  backgroundColor: intensity === lvl.value ? 'var(--primary-light)' : 'var(--bg-card-subtle)',
+                  color: intensity === lvl.value ? 'var(--primary)' : 'var(--text-main)',
+                  fontWeight: intensity === lvl.value ? '700' : '500',
+                  fontSize: '12px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: '2px',
+                  transition: 'all 0.15s ease'
+                }}
+              >
+                <span>{lvl.label}</span>
+                <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>{lvl.sub}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Session Notes Input */}
+        <div>
+          <label style={{ display: 'block', fontSize: '12px', fontWeight: '600', color: 'var(--text-muted)', marginBottom: '6px' }}>
+            Session Notes (Optional)
+          </label>
+          <input 
+            type="text" 
+            placeholder="e.g. 5 sets of bench press, felt energized, 5km PR!" 
+            value={notes} 
+            onChange={(e) => setNotes(e.target.value)} 
             style={inputStyle}
           />
         </div>

@@ -88,8 +88,6 @@ function GoalTracker({ workouts = [], profile, onProfileUpdated }) {
   return (
     <div style={{
       width: '100%',
-      maxWidth: '850px',
-      margin: '0 auto',
       backgroundColor: 'var(--bg-card)',
       borderRadius: '16px',
       border: '1px solid var(--border-color)',

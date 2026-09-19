@@ -6,6 +6,7 @@ import WorkoutCharts from './WorkoutCharts';
 import WorkoutFeed from './WorkoutFeed';
 import StreakTracker from './StreakTracker';
 import Achievements from './Achievements';
+import { calculateTotalCalories } from './utils/calorieUtils';
 
 function Dashboard() {
   const [workouts, setWorkouts] = useState([]);
@@ -65,8 +66,14 @@ function Dashboard() {
 
   const displayName = profile?.name || (profile?.email ? profile.email.split('@')[0] : 'Athlete');
 
+  // Executive KPI summary metrics
+  const totalSessions = workouts.length;
+  const totalMinutes = workouts.reduce((sum, w) => sum + Number(w.duration_minutes || 0), 0);
+  const avgDuration = totalSessions ? Math.round(totalMinutes / totalSessions) : 0;
+  const totalCalories = calculateTotalCalories(workouts);
+
   return (
-    <div style={{ maxWidth: '900px', margin: '0 auto', padding: '16px 20px 80px' }}>
+    <div className="dashboard-container">
       <Navbar profile={profile} onOpenLogModal={openLogModal} />
       
       {/* Top Banner Row */}
@@ -77,14 +84,15 @@ function Dashboard() {
         flexWrap: 'wrap',
         gap: '16px',
         marginBottom: '24px',
-        padding: '0 4px'
+        padding: '0 4px',
+        textAlign: 'left'
       }}>
         <div>
-          <h1 style={{ margin: '0 0 4px', fontSize: '24px', fontWeight: '800', color: 'var(--text-main)', letterSpacing: '-0.5px' }}>
+          <h1 style={{ margin: '0 0 4px', fontSize: '26px', fontWeight: '800', color: 'var(--text-main)', letterSpacing: '-0.5px' }}>
             Welcome back, {displayName} 👋
           </h1>
           <p style={{ margin: 0, fontSize: '14px', color: 'var(--text-muted)' }}>
-            Track your sessions, monitor weekly targets, and review performance trends.
+            Real-time workout analytics, weekly targets, and consistency metrics.
           </p>
         </div>
 
@@ -102,7 +110,7 @@ function Dashboard() {
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
-            boxShadow: '0 4px 12px rgba(79, 70, 229, 0.35)',
+            boxShadow: '0 4px 14px rgba(79, 70, 229, 0.35)',
             transition: 'transform 0.15s ease, box-shadow 0.15s ease'
           }}
         >
@@ -111,29 +119,85 @@ function Dashboard() {
         </button>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-        {/* Weekly Goal Progress */}
-        <GoalTracker 
-          workouts={workouts} 
-          profile={profile} 
-          onProfileUpdated={fetchProfile} 
-        />
+      {/* Executive KPI Summary Cards */}
+      <div className="kpi-grid">
+        <div style={kpiCardStyle}>
+          <div style={{ ...kpiIconStyle, backgroundColor: 'var(--primary-light)', color: 'var(--primary)' }}>
+            🏋️
+          </div>
+          <div>
+            <div style={kpiValueStyle}>{totalSessions}</div>
+            <div style={kpiLabelStyle}>Total Sessions</div>
+          </div>
+        </div>
 
-        {/* Gamification: Streaks & Consistency */}
-        <StreakTracker workouts={workouts} />
+        <div style={kpiCardStyle}>
+          <div style={{ ...kpiIconStyle, backgroundColor: 'var(--success-light)', color: 'var(--success-text)' }}>
+            ⏱️
+          </div>
+          <div>
+            <div style={kpiValueStyle}>
+              {totalMinutes} <span style={{ fontSize: '14px', fontWeight: '600' }}>m</span>
+            </div>
+            <div style={kpiLabelStyle}>Total Active Time</div>
+          </div>
+        </div>
 
-        {/* Milestone Badges & Achievements */}
-        <Achievements workouts={workouts} profile={profile} />
+        <div style={kpiCardStyle}>
+          <div style={{ ...kpiIconStyle, backgroundColor: 'var(--primary-light)', color: 'var(--primary)' }}>
+            ⚡
+          </div>
+          <div>
+            <div style={kpiValueStyle}>
+              {avgDuration} <span style={{ fontSize: '14px', fontWeight: '600' }}>m</span>
+            </div>
+            <div style={kpiLabelStyle}>Average Session</div>
+          </div>
+        </div>
 
-        {/* Analytics & Charts */}
-        <WorkoutCharts workouts={workouts} />
+        <div style={kpiCardStyle}>
+          <div style={{ ...kpiIconStyle, backgroundColor: 'var(--warning-light)', color: 'var(--warning-text)' }}>
+            🔥
+          </div>
+          <div>
+            <div style={kpiValueStyle}>
+              {totalCalories.toLocaleString()} <span style={{ fontSize: '14px', fontWeight: '600' }}>kcal</span>
+            </div>
+            <div style={kpiLabelStyle}>Est. Calories Burned</div>
+          </div>
+        </div>
+      </div>
 
-        {/* History Feed with Live Search, Filters, Sort, Edit, and Delete */}
-        <WorkoutFeed 
-          workouts={workouts} 
-          loading={loading} 
-          onWorkoutChanged={fetchWorkouts} 
-        />
+      {/* Main 2-Column Dashboard Grid */}
+      <div className="dashboard-main-grid">
+        {/* Left Column (Main Focus): Visual Analytics & Workout Feed */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '28px', minWidth: 0 }}>
+          {/* Charts & Graphs */}
+          <WorkoutCharts workouts={workouts} hideSummaryCards={true} />
+
+          {/* History Feed with Live Search, Filters, Sort, Notes, Edit, and Delete */}
+          <WorkoutFeed 
+            workouts={workouts} 
+            loading={loading} 
+            onWorkoutChanged={fetchWorkouts} 
+          />
+        </div>
+
+        {/* Right Column (Sidebar): Weekly Goals, Streaks & Achievements */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '28px', minWidth: 0 }}>
+          {/* Weekly Goal Progress */}
+          <GoalTracker 
+            workouts={workouts} 
+            profile={profile} 
+            onProfileUpdated={fetchProfile} 
+          />
+
+          {/* Gamification: Streaks & Consistency */}
+          <StreakTracker workouts={workouts} />
+
+          {/* Milestone Badges & Achievements */}
+          <Achievements workouts={workouts} profile={profile} />
+        </div>
       </div>
 
       {/* Modal Popup for Logging Workouts */}
@@ -147,5 +211,46 @@ function Dashboard() {
     </div>
   );
 }
+
+const kpiCardStyle = {
+  backgroundColor: 'var(--bg-card)',
+  border: '1px solid var(--border-color)',
+  borderRadius: '16px',
+  padding: '18px 20px',
+  boxShadow: 'var(--shadow-sm)',
+  display: 'flex',
+  alignItems: 'center',
+  gap: '16px',
+  textAlign: 'left',
+  transition: 'background-color 0.3s ease, border-color 0.3s ease'
+};
+
+const kpiIconStyle = {
+  width: '46px',
+  height: '46px',
+  borderRadius: '12px',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  fontSize: '22px',
+  flexShrink: 0
+};
+
+const kpiValueStyle = {
+  fontSize: '24px',
+  fontWeight: '800',
+  color: 'var(--text-main)',
+  letterSpacing: '-0.5px',
+  lineHeight: '1.2'
+};
+
+const kpiLabelStyle = {
+  fontSize: '11px',
+  fontWeight: '700',
+  color: 'var(--text-muted)',
+  textTransform: 'uppercase',
+  letterSpacing: '0.5px',
+  marginTop: '2px'
+};
 
 export default Dashboard;

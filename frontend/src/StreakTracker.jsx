@@ -114,16 +114,14 @@ function StreakTracker({ workouts = [] }) {
   return (
     <div style={{
       width: '100%',
-      maxWidth: '850px',
-      margin: '0 auto',
       backgroundColor: 'var(--bg-card)',
       borderRadius: '16px',
       border: '1px solid var(--border-color)',
-      padding: '22px 28px',
+      padding: '22px 24px',
       boxShadow: 'var(--shadow-sm)',
       display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-      gap: '24px',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+      gap: '20px',
       alignItems: 'center',
       transition: 'background-color 0.3s ease, border-color 0.3s ease'
     }}>
