@@ -132,8 +132,9 @@ function FitnessCalculator() {
       backgroundColor: 'var(--bg-card)',
       borderRadius: '16px',
       border: '1px solid var(--border-color)',
-      padding: '22px 24px',
+      padding: '24px 26px',
       boxShadow: 'var(--shadow-sm)',
+      boxSizing: 'border-box',
       textAlign: 'left',
       transition: 'background-color 0.3s ease, border-color 0.3s ease'
     }}>

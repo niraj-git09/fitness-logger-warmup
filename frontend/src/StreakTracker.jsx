@@ -117,18 +117,27 @@ function StreakTracker({ workouts = [] }) {
       backgroundColor: 'var(--bg-card)',
       borderRadius: '16px',
       border: '1px solid var(--border-color)',
-      padding: '22px 24px',
+      padding: '24px 26px',
       boxShadow: 'var(--shadow-sm)',
-      display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-      gap: '20px',
-      alignItems: 'center',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'space-between',
+      height: '100%',
+      boxSizing: 'border-box',
+      textAlign: 'left',
       transition: 'background-color 0.3s ease, border-color 0.3s ease'
     }}>
-      {/* Left: Streak Counter & Status */}
-      <div style={{ textAlign: 'left' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-          <span style={{ fontSize: '24px' }}>🔥</span>
+      {/* Top Header Row */}
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        flexWrap: 'wrap',
+        gap: '12px',
+        marginBottom: '16px'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ fontSize: '20px' }}>🔥</span>
           <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '700', color: 'var(--text-main)' }}>
             Workout Streak
           </h3>
@@ -146,91 +155,122 @@ function StreakTracker({ workouts = [] }) {
           )}
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginBottom: '6px' }}>
-          <span style={{ fontSize: '36px', fontWeight: '900', color: currentStreak > 0 ? 'var(--warning)' : 'var(--text-muted)' }}>
-            {currentStreak}
-          </span>
-          <span style={{ fontSize: '16px', fontWeight: '700', color: 'var(--text-main)' }}>
-            {currentStreak === 1 ? 'Day' : 'Days'} in a Row
-          </span>
+        <span style={{
+          backgroundColor: 'var(--bg-card-subtle)',
+          color: 'var(--text-muted)',
+          fontSize: '12px',
+          fontWeight: '600',
+          padding: '4px 10px',
+          borderRadius: '8px',
+          border: '1px solid var(--border-color)'
+        }}>
+          🏆 Best: {longestStreak} day{longestStreak === 1 ? '' : 's'}
+        </span>
+      </div>
+
+      {/* Middle Content Row: Streak Counter on left, 7-Day Consistency on right */}
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        flexWrap: 'wrap',
+        gap: '18px',
+        marginBottom: '14px'
+      }}>
+        {/* Left: Streak Counter & Status */}
+        <div style={{ minWidth: '160px' }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginBottom: '4px' }}>
+            <span style={{ fontSize: '36px', fontWeight: '900', color: currentStreak > 0 ? 'var(--warning)' : 'var(--text-muted)', lineHeight: 1 }}>
+              {currentStreak}
+            </span>
+            <span style={{ fontSize: '16px', fontWeight: '700', color: 'var(--text-main)' }}>
+              {currentStreak === 1 ? 'Day' : 'Days'} Streak
+            </span>
+          </div>
+
+          <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-muted)' }}>
+            {workedOutToday 
+              ? '🔥 Checked in today! Great discipline!' 
+              : currentStreak > 0 
+                ? '⚡ Log today to keep your streak!' 
+                : 'Log a workout today to ignite your streak!'}
+          </p>
         </div>
 
-        <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-muted)' }}>
-          {workedOutToday 
-            ? '🔥 You checked in today! Great discipline!' 
-            : currentStreak > 0 
-              ? '⚡ Log a workout today to keep your streak alive!' 
-              : 'Log a workout today to ignite your streak!'}
-        </p>
+        {/* Right: 7-Day Activity Week Matrix */}
+        <div style={{ flexShrink: 0 }}>
+          <div style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-muted)', marginBottom: '8px', textAlign: 'right' }}>
+            7-Day Consistency:
+          </div>
 
-        <div style={{ marginTop: '10px', fontSize: '12px', color: 'var(--text-light)' }}>
-          🏆 Personal Best: <strong>{longestStreak} day{longestStreak === 1 ? '' : 's'}</strong>
+          <div style={{
+            display: 'flex',
+            gap: '8px',
+            alignItems: 'center'
+          }}>
+            {weekDays.map(day => (
+              <div 
+                key={day.name}
+                title={day.isCompleted ? `${day.name} (${day.dateStr}): ${day.minutes} mins of ${day.exercises.join(', ')}` : `${day.name}: Rest Day`}
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: '4px'
+                }}
+              >
+                <span style={{ fontSize: '11px', fontWeight: '600', color: day.isToday ? 'var(--primary)' : 'var(--text-muted)' }}>
+                  {day.name}
+                </span>
+
+                {/* Day Circle */}
+                <div style={{
+                  width: '34px',
+                  height: '34px',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '12px',
+                  fontWeight: '700',
+                  backgroundColor: day.isCompleted 
+                    ? 'var(--success)' 
+                    : day.isToday 
+                      ? 'var(--primary-light)' 
+                      : 'var(--bg-card-subtle)',
+                  color: day.isCompleted 
+                    ? '#ffffff' 
+                    : day.isToday 
+                      ? 'var(--primary)' 
+                      : 'var(--text-muted)',
+                  border: day.isToday 
+                    ? '2px solid var(--primary)' 
+                    : '1px solid var(--border-color)',
+                  boxShadow: day.isCompleted ? '0 2px 6px rgba(16, 185, 129, 0.35)' : 'none',
+                  transition: 'all 0.2s ease'
+                }}>
+                  {day.isCompleted ? '✓' : day.dayNum}
+                </div>
+
+                <span style={{ fontSize: '10px', color: 'var(--text-light)', height: '12px' }}>
+                  {day.isCompleted ? `${day.minutes}m` : ''}
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
-      {/* Right: 7-Day Activity Week Matrix */}
-      <div style={{ textAlign: 'left' }}>
-        <div style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-muted)', marginBottom: '12px' }}>
-          This Week's Consistency:
-        </div>
-
-        <div style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          gap: '8px',
-          alignItems: 'center'
-        }}>
-          {weekDays.map(day => (
-            <div 
-              key={day.name}
-              title={day.isCompleted ? `${day.name} (${day.dateStr}): ${day.minutes} mins of ${day.exercises.join(', ')}` : `${day.name}: Rest Day`}
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: '6px'
-              }}
-            >
-              <span style={{ fontSize: '11px', fontWeight: '600', color: day.isToday ? 'var(--primary)' : 'var(--text-muted)' }}>
-                {day.name}
-              </span>
-
-              {/* Day Circle */}
-              <div style={{
-                width: '36px',
-                height: '36px',
-                borderRadius: '50%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '13px',
-                fontWeight: '700',
-                backgroundColor: day.isCompleted 
-                  ? 'var(--success)' 
-                  : day.isToday 
-                    ? 'var(--primary-light)' 
-                    : 'var(--bg-card-subtle)',
-                color: day.isCompleted 
-                  ? '#ffffff' 
-                  : day.isToday 
-                    ? 'var(--primary)' 
-                    : 'var(--text-muted)',
-                border: day.isToday 
-                  ? '2px solid var(--primary)' 
-                  : '1px solid var(--border-color)',
-                boxShadow: day.isCompleted ? '0 2px 6px rgba(16, 185, 129, 0.35)' : 'none',
-                transition: 'all 0.2s ease',
-                cursor: 'pointer'
-              }}>
-                {day.isCompleted ? '✓' : day.dayNum}
-              </div>
-
-              <span style={{ fontSize: '10px', color: 'var(--text-light)', height: '12px' }}>
-                {day.isCompleted ? `${day.minutes}m` : ''}
-              </span>
-            </div>
-          ))}
-        </div>
+      {/* Bottom Summary Footer */}
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        marginTop: '6px',
+        fontSize: '12px',
+        color: 'var(--text-light)'
+      }}>
+        <span>{weekDays.filter(d => d.isCompleted).length} of 7 days active this week</span>
+        <span>{workedOutToday ? 'Today completed! 🔥' : 'Log a session to keep it alive ⚡'}</span>
       </div>
     </div>
   );

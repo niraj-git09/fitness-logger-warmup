@@ -195,38 +195,58 @@ function Dashboard() {
         </div>
       </div>
 
-      {/* Main 2-Column Dashboard Grid */}
-      <div className="dashboard-main-grid">
-        {/* Left Column (Main Focus): Visual Analytics & Workout Feed */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '28px', minWidth: 0 }}>
-          {/* Charts & Graphs */}
-          <WorkoutCharts workouts={workouts} hideSummaryCards={true} />
-
-          {/* History Feed with Live Search, Filters, Sort, Notes, Edit, and Delete */}
-          <WorkoutFeed 
-            workouts={workouts} 
-            loading={loading} 
-            onWorkoutChanged={fetchWorkouts} 
-          />
+      {/* Section 1: Weekly Habits & Consistency (Balanced 50% / 50% Row) */}
+      <div style={{ marginBottom: '32px' }}>
+        <div className="dashboard-section-header">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ fontSize: '18px' }}>🎯</span>
+            <h2 className="dashboard-section-title">Weekly Goals & Consistency</h2>
+          </div>
+          <span className="dashboard-section-subtitle">Active minute targets and 7-day habit discipline</span>
         </div>
 
-        {/* Right Column (Sidebar): Weekly Goals, Streaks & Achievements */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '28px', minWidth: 0 }}>
-          {/* Weekly Goal Progress */}
+        <div className="dashboard-habits-grid">
           <GoalTracker 
             workouts={workouts} 
             profile={profile} 
             onProfileUpdated={fetchProfile} 
           />
-
-          {/* Gamification: Streaks & Consistency */}
           <StreakTracker workouts={workouts} />
+        </div>
+      </div>
 
-          {/* Milestone Badges & Achievements */}
-          <Achievements workouts={workouts} profile={profile} />
+      {/* Section 2: Main Workspace (Balanced 60% Activity/Analytics vs 40% Athlete Hub) */}
+      <div>
+        <div className="dashboard-section-header">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ fontSize: '18px' }}>⚡</span>
+            <h2 className="dashboard-section-title">Training Activity & Tools</h2>
+          </div>
+          <span className="dashboard-section-subtitle">Performance analytics, session logs, and personal benchmarks</span>
+        </div>
 
-          {/* Health & Body Metrics Calculators */}
-          <FitnessCalculator />
+        <div className="dashboard-main-grid">
+          {/* Left Column (Main Focus): Visual Analytics & Workout Feed */}
+          <div className="dashboard-col-main">
+            {/* Unified Charts & Graphs with View Switcher */}
+            <WorkoutCharts workouts={workouts} hideSummaryCards={true} />
+
+            {/* History Feed with Live Search, Filters, Sort, Notes, Edit, and Delete */}
+            <WorkoutFeed 
+              workouts={workouts} 
+              loading={loading} 
+              onWorkoutChanged={fetchWorkouts} 
+            />
+          </div>
+
+          {/* Right Column (Sidebar Hub): Milestone Badges & Biometrics Calculators */}
+          <div className="dashboard-col-side">
+            {/* Milestone Badges & Achievements */}
+            <Achievements workouts={workouts} profile={profile} />
+
+            {/* Health & Body Metrics Calculators */}
+            <FitnessCalculator />
+          </div>
         </div>
       </div>
 

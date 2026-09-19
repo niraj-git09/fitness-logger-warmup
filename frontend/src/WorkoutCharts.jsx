@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import {
   ResponsiveContainer,
   LineChart,
@@ -13,6 +14,8 @@ import {
 import { calculateTotalCalories } from './utils/calorieUtils';
 
 function WorkoutCharts({ workouts = [], hideSummaryCards = false }) {
+  const [chartView, setChartView] = useState('both'); // 'both', 'trend', 'activity'
+
   if (!workouts || workouts.length === 0) {
     return (
       <div style={{
@@ -63,7 +66,17 @@ function WorkoutCharts({ workouts = [], hideSummaryCards = false }) {
   const categoryData = Object.values(categoryMap);
 
   return (
-    <div style={{ width: '100%' }}>
+    <div style={{
+      width: '100%',
+      backgroundColor: 'var(--bg-card)',
+      borderRadius: '16px',
+      border: '1px solid var(--border-color)',
+      padding: '24px 26px',
+      boxShadow: 'var(--shadow-sm)',
+      boxSizing: 'border-box',
+      textAlign: 'left',
+      transition: 'background-color 0.3s ease, border-color 0.3s ease'
+    }}>
       {/* Quick Summary Cards (shown if not handled by top dashboard bar) */}
       {!hideSummaryCards && (
         <div style={{
@@ -93,71 +106,169 @@ function WorkoutCharts({ workouts = [], hideSummaryCards = false }) {
         </div>
       )}
 
-      {/* Charts Grid */}
+      {/* Unified Card Header with View Switcher */}
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        flexWrap: 'wrap',
+        gap: '12px',
+        marginBottom: '20px'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ fontSize: '20px' }}>📈</span>
+          <div>
+            <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '700', color: 'var(--text-main)' }}>
+              Workout Analytics
+            </h3>
+            <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+              Duration trends and activity distribution
+            </span>
+          </div>
+        </div>
+
+        {/* View Switcher Pills */}
+        <div style={{
+          display: 'flex',
+          backgroundColor: 'var(--bg-card-subtle)',
+          borderRadius: '10px',
+          padding: '3px',
+          border: '1px solid var(--border-color)',
+          gap: '3px'
+        }}>
+          <button
+            type="button"
+            onClick={() => setChartView('trend')}
+            style={{
+              background: chartView === 'trend' ? 'var(--primary)' : 'transparent',
+              color: chartView === 'trend' ? '#ffffff' : 'var(--text-muted)',
+              border: 'none',
+              borderRadius: '7px',
+              padding: '5px 11px',
+              fontSize: '12px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              transition: 'all 0.15s ease'
+            }}
+          >
+            📈 Trend
+          </button>
+          <button
+            type="button"
+            onClick={() => setChartView('activity')}
+            style={{
+              background: chartView === 'activity' ? 'var(--primary)' : 'transparent',
+              color: chartView === 'activity' ? '#ffffff' : 'var(--text-muted)',
+              border: 'none',
+              borderRadius: '7px',
+              padding: '5px 11px',
+              fontSize: '12px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              transition: 'all 0.15s ease'
+            }}
+          >
+            🏋️ Activity
+          </button>
+          <button
+            type="button"
+            onClick={() => setChartView('both')}
+            style={{
+              background: chartView === 'both' ? 'var(--primary)' : 'transparent',
+              color: chartView === 'both' ? '#ffffff' : 'var(--text-muted)',
+              border: 'none',
+              borderRadius: '7px',
+              padding: '5px 11px',
+              fontSize: '12px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              transition: 'all 0.15s ease'
+            }}
+          >
+            ⊞ Both
+          </button>
+        </div>
+      </div>
+
+      {/* Charts Display Grid */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
+        gridTemplateColumns: chartView === 'both' ? 'repeat(auto-fit, minmax(280px, 1fr))' : '1fr',
         gap: '20px'
       }}>
         {/* Timeline Chart */}
-        <div style={chartContainerStyle}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
-            <span style={{ fontSize: '18px' }}>📈</span>
-            <h4 style={{ margin: 0, color: 'var(--text-main)', fontSize: '16px', fontWeight: '700' }}>
-              Duration History (Minutes)
-            </h4>
+        {(chartView === 'both' || chartView === 'trend') && (
+          <div style={{
+            backgroundColor: 'var(--bg-app)',
+            borderRadius: '12px',
+            border: '1px solid var(--border-color)',
+            padding: '16px 14px'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '12px', paddingLeft: '4px' }}>
+              <span style={{ fontSize: '15px' }}>📈</span>
+              <h4 style={{ margin: 0, color: 'var(--text-main)', fontSize: '14px', fontWeight: '700' }}>
+                Duration History (Minutes)
+              </h4>
+            </div>
+            <ResponsiveContainer width="100%" height={250}>
+              <LineChart data={timelineData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" />
+                <XAxis dataKey="date" stroke="var(--text-muted)" tick={{ fontSize: 11 }} />
+                <YAxis stroke="var(--text-muted)" tick={{ fontSize: 11 }} />
+                <Tooltip 
+                  contentStyle={{ backgroundColor: 'var(--bg-card)', borderRadius: '8px', border: '1px solid var(--border-color)', color: 'var(--text-main)' }}
+                  formatter={(value) => [`${value} mins`, 'Duration']}
+                  labelFormatter={(label) => `Date: ${label}`}
+                />
+                <Legend wrapperStyle={{ fontSize: '12px' }} />
+                <Line 
+                  type="monotone" 
+                  dataKey="duration" 
+                  name="Duration (mins)" 
+                  stroke="var(--primary)" 
+                  strokeWidth={3} 
+                  dot={{ r: 4, fill: 'var(--primary)' }} 
+                  activeDot={{ r: 6 }} 
+                />
+              </LineChart>
+            </ResponsiveContainer>
           </div>
-          <ResponsiveContainer width="100%" height={260}>
-            <LineChart data={timelineData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" />
-              <XAxis dataKey="date" stroke="var(--text-muted)" tick={{ fontSize: 11 }} />
-              <YAxis stroke="var(--text-muted)" tick={{ fontSize: 11 }} />
-              <Tooltip 
-                contentStyle={{ backgroundColor: 'var(--bg-card)', borderRadius: '8px', border: '1px solid var(--border-color)', color: 'var(--text-main)' }}
-                formatter={(value) => [`${value} mins`, 'Duration']}
-                labelFormatter={(label) => `Date: ${label}`}
-              />
-              <Legend wrapperStyle={{ fontSize: '12px' }} />
-              <Line 
-                type="monotone" 
-                dataKey="duration" 
-                name="Duration (mins)" 
-                stroke="var(--primary)" 
-                strokeWidth={3} 
-                dot={{ r: 4, fill: 'var(--primary)' }} 
-                activeDot={{ r: 6 }} 
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
+        )}
 
         {/* Exercise Distribution Chart */}
-        <div style={chartContainerStyle}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
-            <span style={{ fontSize: '18px' }}>🏋️</span>
-            <h4 style={{ margin: 0, color: 'var(--text-main)', fontSize: '16px', fontWeight: '700' }}>
-              Minutes by Activity
-            </h4>
+        {(chartView === 'both' || chartView === 'activity') && (
+          <div style={{
+            backgroundColor: 'var(--bg-app)',
+            borderRadius: '12px',
+            border: '1px solid var(--border-color)',
+            padding: '16px 14px'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '12px', paddingLeft: '4px' }}>
+              <span style={{ fontSize: '15px' }}>🏋️</span>
+              <h4 style={{ margin: 0, color: 'var(--text-main)', fontSize: '14px', fontWeight: '700' }}>
+                Minutes by Activity
+              </h4>
+            </div>
+            <ResponsiveContainer width="100%" height={250}>
+              <BarChart data={categoryData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" />
+                <XAxis dataKey="exercise" stroke="var(--text-muted)" tick={{ fontSize: 11 }} />
+                <YAxis stroke="var(--text-muted)" tick={{ fontSize: 11 }} />
+                <Tooltip 
+                  contentStyle={{ backgroundColor: 'var(--bg-card)', borderRadius: '8px', border: '1px solid var(--border-color)', color: 'var(--text-main)' }}
+                  formatter={(value) => [`${value} mins`, 'Total Time']}
+                />
+                <Legend wrapperStyle={{ fontSize: '12px' }} />
+                <Bar 
+                  dataKey="totalMinutes" 
+                  name="Total Minutes" 
+                  fill="var(--success)" 
+                  radius={[6, 6, 0, 0]} 
+                />
+              </BarChart>
+            </ResponsiveContainer>
           </div>
-          <ResponsiveContainer width="100%" height={260}>
-            <BarChart data={categoryData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" />
-              <XAxis dataKey="exercise" stroke="var(--text-muted)" tick={{ fontSize: 11 }} />
-              <YAxis stroke="var(--text-muted)" tick={{ fontSize: 11 }} />
-              <Tooltip 
-                contentStyle={{ backgroundColor: 'var(--bg-card)', borderRadius: '8px', border: '1px solid var(--border-color)', color: 'var(--text-main)' }}
-                formatter={(value) => [`${value} mins`, 'Total Time']}
-              />
-              <Legend wrapperStyle={{ fontSize: '12px' }} />
-              <Bar 
-                dataKey="totalMinutes" 
-                name="Total Minutes" 
-                fill="var(--success)" 
-                radius={[6, 6, 0, 0]} 
-              />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
+        )}
       </div>
     </div>
   );

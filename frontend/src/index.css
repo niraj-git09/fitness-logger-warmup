@@ -172,24 +172,87 @@ input:-webkit-autofill:focus {
   box-sizing: border-box;
 }
 
-.kpi-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 16px;
-  margin-bottom: 26px;
+/* Section Header Typography */
+.dashboard-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+  padding: 0 4px;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
+.dashboard-section-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin: 0;
+}
+
+.dashboard-section-subtitle {
+  font-size: 12px;
+  color: var(--text-light);
+  font-weight: 500;
+}
+
+/* Executive KPI Strip */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  margin-bottom: 30px;
+}
+
+/* Weekly Progress & Consistency Habits Grid (Balanced 50% / 50%) */
+.dashboard-habits-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  margin-bottom: 34px;
+  align-items: stretch;
+}
+
+/* Main Workspace: 60% Activity & Analytics vs 40% Athlete Hub */
 .dashboard-main-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.8fr) minmax(360px, 1.2fr);
+  grid-template-columns: minmax(0, 1.75fr) minmax(360px, 1.15fr);
   gap: 28px;
   align-items: start;
 }
 
-@media (max-width: 1120px) {
+.dashboard-col-main {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  min-width: 0;
+}
+
+.dashboard-col-side {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  min-width: 0;
+}
+
+/* Breakpoints */
+@media (max-width: 1160px) {
+  .dashboard-habits-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
   .dashboard-main-grid {
     grid-template-columns: 1fr;
     gap: 24px;
+  }
+}
+
+@media (max-width: 900px) {
+  .kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
   }
 }
 
@@ -198,7 +261,7 @@ input:-webkit-autofill:focus {
     padding: 16px 14px 60px;
   }
   .kpi-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr;
     gap: 10px;
   }
 }
