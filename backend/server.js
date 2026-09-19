@@ -15,7 +15,7 @@ app.use(express.json()); // Allows your server to read incoming JSON data
 
 // A quick test route to verify the server is listening
 app.get('/', (req, res) => {
-    res.send('Fitness Logger API is running!');
+    res.send('FitCheck API is running!');
 });
 
 // ==========================================

@@ -225,14 +225,33 @@ function WeeklyReportModal({ workouts = [], profile, onClose }) {
             gap: '16px'
           }}>
             <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                <span style={{ fontSize: '24px' }}>🏋️</span>
-                <h2 style={{ margin: 0, fontSize: '22px', fontWeight: '800', color: 'var(--text-main)' }}>
-                  Fitness Performance Report
-                </h2>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px' }}>
+                <img 
+                  src="/fitcheck-icon.png" 
+                  alt="FitCheck" 
+                  style={{ height: '36px', width: 'auto', objectFit: 'contain' }} 
+                />
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: '2px' }}>
+                  <span style={{ fontSize: '22px', fontWeight: '900', fontStyle: 'italic', color: 'var(--text-main)' }}>
+                    FIT
+                  </span>
+                  <span style={{
+                    fontSize: '22px',
+                    fontWeight: '900',
+                    fontStyle: 'italic',
+                    background: 'linear-gradient(135deg, #38bdf8 0%, #22c55e 100%)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent'
+                  }}>
+                    CHECK
+                  </span>
+                  <span style={{ fontSize: '20px', fontWeight: '800', color: 'var(--text-main)', marginLeft: '6px' }}>
+                    Performance Report
+                  </span>
+                </div>
               </div>
               <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-muted)' }}>
-                Generated for <strong>{displayName}</strong> ({profile?.email || 'Registered Athlete'})
+                Official Athlete Performance Summary for <strong>{displayName}</strong> ({profile?.email || 'Registered Athlete'})
               </p>
             </div>
 

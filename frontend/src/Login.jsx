@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import SplashAnimation from './SplashAnimation';
 
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showSplash, setShowSplash] = useState(false);
   const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'light');
   const navigate = useNavigate();
 
@@ -31,7 +33,7 @@ function Login() {
       if (response.ok) {
         const data = await response.json();
         localStorage.setItem('token', data.token); 
-        navigate('/dashboard');
+        setShowSplash(true);
       } else {
         const data = await response.json();
         setErrorMessage(data.error || 'Invalid credentials');
@@ -42,6 +44,16 @@ function Login() {
       setIsLoading(false);
     }
   };
+
+  if (showSplash) {
+    return (
+      <SplashAnimation 
+        message="Welcome back! Powering up your training hub..." 
+        durationMs={3500}
+        onComplete={() => navigate('/dashboard')} 
+      />
+    );
+  }
 
   return (
     <div style={{
@@ -81,27 +93,46 @@ function Login() {
         {theme === 'dark' ? '☀️' : '🌙'}
       </button>
 
-      {/* Brand Icon */}
-      <div style={{
-        width: '54px',
-        height: '54px',
-        backgroundColor: '#4f46e5',
-        borderRadius: '14px',
-        margin: '0 auto 16px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontSize: '28px',
-        boxShadow: '0 4px 12px rgba(79, 70, 229, 0.3)'
-      }}>
-        🏋️
+      {/* FitCheck Brand Logo */}
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '20px' }}>
+        <img 
+          src="/fitcheck-icon.png" 
+          alt="FitCheck Icon" 
+          style={{ 
+            height: '54px',
+            width: 'auto',
+            objectFit: 'contain',
+            filter: 'drop-shadow(0 0 14px rgba(56, 189, 248, 0.45))',
+            marginBottom: '8px'
+          }} 
+        />
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: '2px', lineHeight: 1 }}>
+          <span style={{ fontSize: '26px', fontWeight: '900', fontStyle: 'italic', color: 'var(--text-main)', letterSpacing: '-0.5px' }}>
+            FIT
+          </span>
+          <span style={{
+            fontSize: '26px',
+            fontWeight: '900',
+            fontStyle: 'italic',
+            letterSpacing: '-0.5px',
+            background: 'linear-gradient(135deg, #38bdf8 0%, #22c55e 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            filter: 'drop-shadow(0 0 12px rgba(34, 197, 94, 0.35))'
+          }}>
+            CHECK
+          </span>
+        </div>
+        <span style={{ fontSize: '10px', fontWeight: '700', color: 'var(--text-muted)', letterSpacing: '1.2px', textTransform: 'uppercase', marginTop: '4px' }}>
+          Your Personal Fitness Logger
+        </span>
       </div>
 
-      <h2 style={{ fontSize: '24px', fontWeight: '800', color: 'var(--text-main)', margin: '0 0 6px 0' }}>
+      <h2 style={{ fontSize: '20px', fontWeight: '700', color: 'var(--text-main)', margin: '0 0 6px 0' }}>
         Welcome Back
       </h2>
-      <p style={{ color: 'var(--text-muted)', fontSize: '14px', margin: '0 0 24px 0' }}>
-        Log in to track your workouts and reach your goals.
+      <p style={{ color: 'var(--text-muted)', fontSize: '13px', margin: '0 0 22px 0' }}>
+        Log in to track your workouts, streaks, and fitness goals.
       </p>
 
       {errorMessage && (

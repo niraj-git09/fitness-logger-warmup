@@ -8,6 +8,7 @@ import StreakTracker from './StreakTracker';
 import Achievements from './Achievements';
 import WeeklyReportModal from './WeeklyReportModal';
 import FitnessCalculator from './FitnessCalculator';
+import SplashAnimation from './SplashAnimation';
 import { calculateTotalCalories } from './utils/calorieUtils';
 
 function Dashboard() {
@@ -16,6 +17,19 @@ function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [isLogModalOpen, setIsLogModalOpen] = useState(false);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  const [showSplash, setShowSplash] = useState(() => {
+    // Play on first visit of current browser session
+    return !sessionStorage.getItem('fitcheck_intro_seen');
+  });
+
+  const handleSplashDone = () => {
+    sessionStorage.setItem('fitcheck_intro_seen', 'true');
+    setShowSplash(false);
+  };
+
+  const handleReplayIntro = () => {
+    setShowSplash(true);
+  };
 
   const fetchWorkouts = async () => {
     const token = localStorage.getItem('token');
@@ -77,7 +91,18 @@ function Dashboard() {
 
   return (
     <div className="dashboard-container">
-      <Navbar profile={profile} onOpenLogModal={openLogModal} />
+      {showSplash && (
+        <SplashAnimation 
+          message="FitCheck • Your Personal Fitness Logger" 
+          durationMs={3600}
+          onComplete={handleSplashDone} 
+        />
+      )}
+      <Navbar 
+        profile={profile} 
+        onOpenLogModal={openLogModal} 
+        onReplayIntro={handleReplayIntro} 
+      />
       
       {/* Top Banner Row */}
       <div style={{

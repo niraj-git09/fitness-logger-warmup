@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-function Navbar({ profile, onOpenLogModal }) {
+function Navbar({ profile, onOpenLogModal, onReplayIntro }) {
   const navigate = useNavigate();
 
   // Initialize theme from localStorage or system preference
@@ -42,37 +42,65 @@ function Navbar({ profile, onOpenLogModal }) {
       display: 'flex',
       justifyContent: 'space-between',
       alignItems: 'center',
-      padding: '16px 28px',
+      padding: '14px 24px',
       backgroundColor: 'var(--navbar-bg)',
       color: '#ffffff',
-      borderRadius: '16px',
-      marginBottom: '24px',
+      borderRadius: '18px',
+      marginBottom: '26px',
       boxShadow: '0 8px 20px rgba(0, 0, 0, 0.2)',
       flexWrap: 'wrap',
       gap: '16px',
       transition: 'background-color 0.3s ease'
     }}>
       {/* Brand Identity */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-        <div style={{
-          width: '42px',
-          height: '42px',
-          borderRadius: '12px',
-          background: 'linear-gradient(135deg, #6366f1, #4f46e5)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: '22px',
-          boxShadow: '0 4px 10px rgba(79, 70, 229, 0.3)'
-        }}>
-          🏋️
-        </div>
-        <div>
-          <h2 style={{ margin: 0, fontSize: '20px', fontWeight: '800', letterSpacing: '-0.5px' }}>
-            Fitness Logger
-          </h2>
-          <span style={{ fontSize: '11px', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '1px' }}>
-            Personal Performance
+      <div 
+        onClick={onReplayIntro}
+        title="FitCheck • Click to replay intro animation"
+        style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: onReplayIntro ? 'pointer' : 'default', userSelect: 'none' }}
+      >
+        <img 
+          src="/fitcheck-icon.png" 
+          alt="FitCheck Icon" 
+          style={{ 
+            height: '42px',
+            width: 'auto',
+            objectFit: 'contain',
+            filter: 'drop-shadow(0 0 10px rgba(56, 189, 248, 0.45))'
+          }} 
+        />
+        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: '1px', lineHeight: 1 }}>
+            <span style={{
+              fontSize: '22px',
+              fontWeight: '900',
+              fontStyle: 'italic',
+              letterSpacing: '-0.3px',
+              color: '#ffffff'
+            }}>
+              FIT
+            </span>
+            <span style={{
+              fontSize: '22px',
+              fontWeight: '900',
+              fontStyle: 'italic',
+              letterSpacing: '-0.3px',
+              background: 'linear-gradient(135deg, #38bdf8 0%, #22c55e 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              filter: 'drop-shadow(0 0 12px rgba(34, 197, 94, 0.35))'
+            }}>
+              CHECK
+            </span>
+          </div>
+          <span style={{
+            fontSize: '10px',
+            fontWeight: '700',
+            color: '#94a3b8',
+            letterSpacing: '1.2px',
+            textTransform: 'uppercase',
+            marginTop: '3px'
+          }}>
+            Your Personal Fitness Logger
           </span>
         </div>
       </div>
