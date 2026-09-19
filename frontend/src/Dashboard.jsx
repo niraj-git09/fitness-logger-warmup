@@ -6,6 +6,8 @@ import WorkoutCharts from './WorkoutCharts';
 import WorkoutFeed from './WorkoutFeed';
 import StreakTracker from './StreakTracker';
 import Achievements from './Achievements';
+import WeeklyReportModal from './WeeklyReportModal';
+import FitnessCalculator from './FitnessCalculator';
 import { calculateTotalCalories } from './utils/calorieUtils';
 
 function Dashboard() {
@@ -13,6 +15,7 @@ function Dashboard() {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isLogModalOpen, setIsLogModalOpen] = useState(false);
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
 
   const fetchWorkouts = async () => {
     const token = localStorage.getItem('token');
@@ -96,27 +99,51 @@ function Dashboard() {
           </p>
         </div>
 
-        <button
-          onClick={openLogModal}
-          style={{
-            backgroundColor: 'var(--primary)',
-            color: '#ffffff',
-            border: 'none',
-            borderRadius: '12px',
-            padding: '12px 24px',
-            fontSize: '14px',
-            fontWeight: '700',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            boxShadow: '0 4px 14px rgba(79, 70, 229, 0.35)',
-            transition: 'transform 0.15s ease, box-shadow 0.15s ease'
-          }}
-        >
-          <span style={{ fontSize: '16px' }}>➕</span>
-          <span>Log Workout</span>
-        </button>
+        <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
+          <button
+            onClick={() => setIsReportModalOpen(true)}
+            style={{
+              backgroundColor: 'var(--bg-card)',
+              color: 'var(--text-main)',
+              border: '1px solid var(--border-color)',
+              borderRadius: '12px',
+              padding: '12px 18px',
+              fontSize: '14px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              boxShadow: 'var(--shadow-sm)',
+              transition: 'all 0.15s ease'
+            }}
+          >
+            <span style={{ fontSize: '16px' }}>📊</span>
+            <span>Performance Report</span>
+          </button>
+
+          <button
+            onClick={openLogModal}
+            style={{
+              backgroundColor: 'var(--primary)',
+              color: '#ffffff',
+              border: 'none',
+              borderRadius: '12px',
+              padding: '12px 22px',
+              fontSize: '14px',
+              fontWeight: '700',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              boxShadow: '0 4px 14px rgba(79, 70, 229, 0.35)',
+              transition: 'transform 0.15s ease, box-shadow 0.15s ease'
+            }}
+          >
+            <span style={{ fontSize: '16px' }}>➕</span>
+            <span>Log Workout</span>
+          </button>
+        </div>
       </div>
 
       {/* Executive KPI Summary Cards */}
@@ -197,6 +224,9 @@ function Dashboard() {
 
           {/* Milestone Badges & Achievements */}
           <Achievements workouts={workouts} profile={profile} />
+
+          {/* Health & Body Metrics Calculators */}
+          <FitnessCalculator />
         </div>
       </div>
 
@@ -206,6 +236,15 @@ function Dashboard() {
           isModal={true} 
           onClose={closeLogModal} 
           onWorkoutAdded={fetchWorkouts} 
+        />
+      )}
+
+      {/* Modal Popup for Weekly Performance Report */}
+      {isReportModalOpen && (
+        <WeeklyReportModal
+          workouts={workouts}
+          profile={profile}
+          onClose={() => setIsReportModalOpen(false)}
         />
       )}
     </div>

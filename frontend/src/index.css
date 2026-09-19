@@ -202,3 +202,40 @@ input:-webkit-autofill:focus {
     gap: 10px;
   }
 }
+
+/* Print Stylesheet for Clean Paper / PDF Reports */
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  .no-print,
+  nav,
+  .dashboard-container > div:not(.modal-overlay) {
+    display: none !important;
+  }
+
+  .modal-overlay {
+    position: static !important;
+    background: transparent !important;
+    padding: 0 !important;
+    display: block !important;
+    inset: auto !important;
+  }
+
+  .printable-report {
+    box-shadow: none !important;
+    border: none !important;
+    max-width: 100% !important;
+    max-height: none !important;
+    overflow: visible !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+  }
+
+  #print-area * {
+    color: #111827 !important;
+    border-color: #e5e7eb !important;
+  }
+}

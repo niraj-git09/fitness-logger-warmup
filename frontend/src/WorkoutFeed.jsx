@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { calculateCalories } from './utils/calorieUtils';
+import { exportToCSV, exportToJSON } from './utils/exportUtils';
 
 const CATEGORIES = ['All', 'Running', 'Weight Training', 'Cycling', 'Yoga', 'Swimming', 'Walking'];
 
@@ -261,24 +262,72 @@ function WorkoutFeed({ workouts: propWorkouts, loading: propLoading, onWorkoutCh
           </span>
         </div>
 
-        {hasActiveFilters && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+          {hasActiveFilters && (
+            <button
+              onClick={resetFilters}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: 'var(--primary)',
+                fontSize: '13px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                marginRight: '4px'
+              }}
+            >
+              <span>🔄</span> Clear Filters
+            </button>
+          )}
+
+          {/* Export Action Buttons */}
           <button
-            onClick={resetFilters}
+            type="button"
+            onClick={() => exportToCSV(filteredWorkouts)}
+            title="Export workouts as CSV spreadsheet"
             style={{
-              background: 'none',
-              border: 'none',
-              color: 'var(--primary)',
-              fontSize: '13px',
+              backgroundColor: 'var(--bg-card)',
+              border: '1px solid var(--border-color)',
+              borderRadius: '8px',
+              padding: '5px 11px',
+              fontSize: '12px',
               fontWeight: '600',
+              color: 'var(--text-main)',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
-              gap: '4px'
+              gap: '4px',
+              boxShadow: 'var(--shadow-sm)'
             }}
           >
-            <span>🔄</span> Clear Filters
+            <span>📥</span> CSV
           </button>
-        )}
+
+          <button
+            type="button"
+            onClick={() => exportToJSON(filteredWorkouts)}
+            title="Export workouts as JSON"
+            style={{
+              backgroundColor: 'var(--bg-card)',
+              border: '1px solid var(--border-color)',
+              borderRadius: '8px',
+              padding: '5px 11px',
+              fontSize: '12px',
+              fontWeight: '600',
+              color: 'var(--text-main)',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+              boxShadow: 'var(--shadow-sm)'
+            }}
+          >
+            <span>📄</span> JSON
+          </button>
+        </div>
       </div>
 
       {/* Interactive Controls & Filters Card */}
