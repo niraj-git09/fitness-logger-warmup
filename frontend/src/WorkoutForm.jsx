@@ -9,15 +9,41 @@ const POPULAR_EXERCISES = [
   { name: 'Walking', icon: '🚶' }
 ];
 
-function WorkoutForm({ onWorkoutAdded, isModal = false, onClose }) {
+const ROUTINE_PRESETS = [
+  { label: '30m Run', exercise: 'Running', duration: 30, intensity: 'high', icon: '🏃' },
+  { label: '45m Strength', exercise: 'Weight Training', duration: 45, intensity: 'medium', icon: '🏋️' },
+  { label: '25m Cycling', exercise: 'Cycling', duration: 25, intensity: 'high', icon: '🚴' },
+  { label: '20m Yoga', exercise: 'Yoga', duration: 20, intensity: 'low', icon: '🧘' },
+  { label: '30m Brisk Walk', exercise: 'Walking', duration: 30, intensity: 'low', icon: '🚶' },
+  { label: '40m Swim', exercise: 'Swimming', duration: 40, intensity: 'high', icon: '🏊' }
+];
+
+function WorkoutForm({ onWorkoutAdded, isModal = false, onClose, initialData = null }) {
   const today = new Date().toISOString().split('T')[0];
-  const [exerciseType, setExerciseType] = useState('');
-  const [duration, setDuration] = useState('');
-  const [date, setDate] = useState(today);
-  const [intensity, setIntensity] = useState('medium');
-  const [notes, setNotes] = useState('');
+  const [exerciseType, setExerciseType] = useState(initialData?.exercise_type || '');
+  const [duration, setDuration] = useState(initialData?.duration_minutes ? String(initialData.duration_minutes) : '');
+  const [date, setDate] = useState(initialData?.date_logged ? initialData.date_logged.split('T')[0] : today);
+  const [intensity, setIntensity] = useState(initialData?.intensity || 'medium');
+  const [notes, setNotes] = useState(initialData?.notes || '');
   const [statusMessage, setStatusMessage] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Sync form if initialData prop changes
+  useEffect(() => {
+    if (initialData) {
+      setExerciseType(initialData.exercise_type || '');
+      setDuration(initialData.duration_minutes ? String(initialData.duration_minutes) : '');
+      setIntensity(initialData.intensity || 'medium');
+      setNotes(initialData.notes || '');
+      setDate(today);
+    }
+  }, [initialData, today]);
+
+  const handleApplyPreset = (preset) => {
+    setExerciseType(preset.exercise);
+    setDuration(String(preset.duration));
+    setIntensity(preset.intensity);
+  };
 
   // Close modal on Escape key
   useEffect(() => {
@@ -146,10 +172,105 @@ function WorkoutForm({ onWorkoutAdded, isModal = false, onClose }) {
         </div>
       </div>
 
-      {/* Fast Selection Chips */}
+      {/* Pre-fill Notice Banner if re-logging */}
+      {initialData && (
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          backgroundColor: 'var(--primary-light)',
+          border: '1px solid var(--primary)',
+          borderRadius: '10px',
+          padding: '8px 12px',
+          marginBottom: '16px',
+          fontSize: '12px',
+          color: 'var(--primary)',
+          fontWeight: '600'
+        }}>
+          <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span>🔁</span> Pre-filled from your previous session (Date set to today)
+          </span>
+          <button
+            type="button"
+            onClick={() => {
+              setExerciseType('');
+              setDuration('');
+              setIntensity('medium');
+              setNotes('');
+            }}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: 'var(--primary)',
+              fontSize: '11px',
+              fontWeight: '700',
+              cursor: 'pointer',
+              textDecoration: 'underline'
+            }}
+          >
+            Reset
+          </button>
+        </div>
+      )}
+
+      {/* 1-Click Quick Routine Presets */}
+      <div style={{ marginBottom: '14px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+          <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'flex', alignItems: 'center', gap: '5px' }}>
+            <span>⚡</span> Quick Routine Presets:
+          </span>
+          <span style={{ fontSize: '11px', color: 'var(--primary)', fontWeight: '600' }}>
+            1-Click Fast Fill
+          </span>
+        </div>
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+          {ROUTINE_PRESETS.map((preset) => {
+            const isSelected = exerciseType.toLowerCase() === preset.exercise.toLowerCase() && 
+                               duration === String(preset.duration) && 
+                               intensity === preset.intensity;
+            return (
+              <button
+                key={preset.label}
+                type="button"
+                onClick={() => handleApplyPreset(preset)}
+                title={`Auto-fill: ${preset.exercise}, ${preset.duration} mins, ${preset.intensity} intensity`}
+                style={{
+                  backgroundColor: isSelected ? 'var(--primary)' : 'var(--bg-card-subtle)',
+                  border: isSelected ? '1px solid var(--primary)' : '1px solid var(--border-color)',
+                  color: isSelected ? '#ffffff' : 'var(--text-main)',
+                  borderRadius: '10px',
+                  padding: '6px 12px',
+                  fontSize: '12px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  transition: 'all 0.15s ease',
+                  boxShadow: isSelected ? '0 0 10px rgba(59, 130, 246, 0.3)' : 'none'
+                }}
+              >
+                <span>{preset.icon}</span>
+                <span>{preset.label}</span>
+                <span style={{
+                  fontSize: '10px',
+                  opacity: isSelected ? 0.9 : 0.65,
+                  padding: '1px 5px',
+                  borderRadius: '4px',
+                  backgroundColor: isSelected ? 'rgba(255,255,255,0.2)' : 'var(--bg-card)'
+                }}>
+                  {preset.intensity === 'high' ? 'High' : preset.intensity === 'low' ? 'Low' : 'Mod'}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Activity Type Quick Select Chips */}
       <div style={{ marginBottom: '16px' }}>
         <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-          Quick Select Activity:
+          Or Select Activity Type:
         </span>
         <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '6px' }}>
           {POPULAR_EXERCISES.map((item) => (
@@ -162,10 +283,11 @@ function WorkoutForm({ onWorkoutAdded, isModal = false, onClose }) {
                 border: exerciseType === item.name ? '1px solid var(--primary)' : '1px solid var(--border-color)',
                 color: exerciseType === item.name ? 'var(--primary)' : 'var(--text-muted)',
                 borderRadius: '9999px',
-                padding: '5px 12px',
-                fontSize: '12px',
+                padding: '4px 10px',
+                fontSize: '11px',
                 fontWeight: '600',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                transition: 'all 0.15s ease'
               }}
             >
               {item.icon} {item.name}

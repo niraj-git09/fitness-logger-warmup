@@ -78,8 +78,18 @@ function Dashboard() {
     fetchProfile();
   }, []);
 
-  const openLogModal = () => setIsLogModalOpen(true);
-  const closeLogModal = () => setIsLogModalOpen(false);
+  const [logModalInitialData, setLogModalInitialData] = useState(null);
+
+  const openLogModal = (presetData = null) => {
+    const data = presetData && typeof presetData === 'object' && !presetData.nativeEvent ? presetData : null;
+    setLogModalInitialData(data);
+    setIsLogModalOpen(true);
+  };
+
+  const closeLogModal = () => {
+    setIsLogModalOpen(false);
+    setLogModalInitialData(null);
+  };
 
   const displayName = profile?.name || (profile?.email ? profile.email.split('@')[0] : 'Athlete');
 
@@ -261,6 +271,7 @@ function Dashboard() {
               workouts={workouts} 
               loading={loading} 
               onWorkoutChanged={fetchWorkouts} 
+              onRepeatWorkout={(workout) => openLogModal(workout)}
             />
           </div>
 
@@ -281,6 +292,7 @@ function Dashboard() {
           isModal={true} 
           onClose={closeLogModal} 
           onWorkoutAdded={fetchWorkouts} 
+          initialData={logModalInitialData}
         />
       )}
 

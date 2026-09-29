@@ -4,7 +4,7 @@ import { exportToCSV, exportToJSON } from './utils/exportUtils';
 
 const CATEGORIES = ['All', 'Running', 'Weight Training', 'Cycling', 'Yoga', 'Swimming', 'Walking'];
 
-function WorkoutFeed({ workouts: propWorkouts, loading: propLoading, onWorkoutChanged }) {
+function WorkoutFeed({ workouts: propWorkouts, loading: propLoading, onWorkoutChanged, onRepeatWorkout }) {
   const [internalWorkouts, setInternalWorkouts] = useState([]);
   const [internalLoading, setInternalLoading] = useState(true);
 
@@ -682,6 +682,17 @@ function WorkoutFeed({ workouts: propWorkouts, loading: propLoading, onWorkoutCh
                         </span>
 
                         {renderIntensityBadge(workout.intensity)}
+
+                        {onRepeatWorkout && (
+                          <button 
+                            type="button"
+                            onClick={() => onRepeatWorkout(workout)}
+                            title="Re-log this session (pre-fills form with today's date)"
+                            style={{ ...actionBtnStyle, color: 'var(--primary)', borderColor: 'var(--primary-light)' }}
+                          >
+                            🔁 Repeat
+                          </button>
+                        )}
 
                         <button 
                           onClick={() => startEdit(workout)}
