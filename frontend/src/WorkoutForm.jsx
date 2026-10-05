@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { triggerWorkoutLoggedBurst } from './utils/confettiUtils';
 
 const POPULAR_EXERCISES = [
   { name: 'Running', icon: '🏃' },
@@ -81,6 +82,7 @@ function WorkoutForm({ onWorkoutAdded, isModal = false, onClose, initialData = n
       });
 
       if (response.ok) {
+        triggerWorkoutLoggedBurst();
         setStatusMessage({ type: 'success', text: '✅ Session logged securely!' });
         setExerciseType('');
         setDuration('');

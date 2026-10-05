@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { triggerGoalCrushedConfetti } from './utils/confettiUtils';
 
 function GoalTracker({ workouts = [], profile, onProfileUpdated }) {
   const [isEditingGoal, setIsEditingGoal] = useState(false);
@@ -33,6 +34,27 @@ function GoalTracker({ workouts = [], profile, onProfileUpdated }) {
 
   const percentage = Math.min(100, Math.round((weeklyMinutes / goal) * 100));
   const remaining = Math.max(0, goal - weeklyMinutes);
+
+  const prevPercentageRef = useRef(null);
+
+  // Automatically celebrate with confetti when weekly goal reaches 100%
+  useEffect(() => {
+    if (percentage >= 100) {
+      const weekKey = `fitcheck_goal_celebrated_${monday.toISOString().slice(0, 10)}`;
+      const alreadyCelebrated = sessionStorage.getItem(weekKey);
+      
+      const justCrushed = prevPercentageRef.current !== null && prevPercentageRef.current < 100 && percentage >= 100;
+      
+      if (!alreadyCelebrated || justCrushed) {
+        sessionStorage.setItem(weekKey, 'true');
+        const timer = setTimeout(() => {
+          triggerGoalCrushedConfetti();
+        }, 350);
+        return () => clearTimeout(timer);
+      }
+    }
+    prevPercentageRef.current = percentage;
+  }, [percentage, monday]);
 
   const handleSaveGoal = async (e) => {
     e.preventDefault();
@@ -90,16 +112,16 @@ function GoalTracker({ workouts = [], profile, onProfileUpdated }) {
       width: '100%',
       backgroundColor: 'var(--bg-card)',
       borderRadius: '16px',
-      border: '1px solid var(--border-color)',
+      border: percentage >= 100 ? '1px solid rgba(16, 185, 129, 0.45)' : '1px solid var(--border-color)',
       padding: '24px 26px',
-      boxShadow: 'var(--shadow-sm)',
+      boxShadow: percentage >= 100 ? '0 2px 18px rgba(16, 185, 129, 0.15), var(--shadow-sm)' : 'var(--shadow-sm)',
       textAlign: 'left',
       height: '100%',
       boxSizing: 'border-box',
       display: 'flex',
       flexDirection: 'column',
       justifyContent: 'space-between',
-      transition: 'background-color 0.3s ease, border-color 0.3s ease'
+      transition: 'background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease'
     }}>
       {/* Top Header Row */}
       <div style={{
@@ -122,17 +144,45 @@ function GoalTracker({ workouts = [], profile, onProfileUpdated }) {
           </span>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
           <span style={{
             backgroundColor: badgeBg,
             color: badgeColor,
             fontWeight: '600',
             padding: '4px 12px',
             borderRadius: '9999px',
-            fontSize: '13px'
+            fontSize: '13px',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '4px'
           }}>
             {badgeText}
           </span>
+
+          {percentage >= 100 && (
+            <button
+              type="button"
+              onClick={triggerGoalCrushedConfetti}
+              style={{
+                backgroundColor: 'rgba(16, 185, 129, 0.16)',
+                border: '1px solid rgba(16, 185, 129, 0.45)',
+                color: 'var(--success-text)',
+                borderRadius: '8px',
+                padding: '5px 12px',
+                fontSize: '12px',
+                fontWeight: '700',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '5px',
+                boxShadow: '0 0 10px rgba(16, 185, 129, 0.25)',
+                transition: 'all 0.15s ease'
+              }}
+              title="Click to fire celebratory confetti!"
+            >
+              <span>🎉</span> Celebrate!
+            </button>
+          )}
 
           <button
             onClick={() => {
@@ -238,9 +288,10 @@ function GoalTracker({ workouts = [], profile, onProfileUpdated }) {
           width: `${percentage}%`,
           height: '100%',
           background: percentage >= 100
-            ? 'linear-gradient(90deg, #10b981, #059669)'
+            ? 'linear-gradient(90deg, #10b981, #06b6d4)'
             : 'linear-gradient(90deg, #6366f1, #4f46e5)',
           borderRadius: '9999px',
+          boxShadow: percentage >= 100 ? '0 0 10px rgba(16, 185, 129, 0.5)' : 'none',
           transition: 'width 0.6s cubic-bezier(0.4, 0, 0.2, 1)'
         }} />
       </div>
@@ -253,7 +304,9 @@ function GoalTracker({ workouts = [], profile, onProfileUpdated }) {
         color: 'var(--text-light)'
       }}>
         <span>{thisWeekWorkouts.length} session{thisWeekWorkouts.length === 1 ? '' : 's'} logged this week</span>
-        <span>{remaining === 0 ? 'Goal completed! 🌟' : `${remaining} mins to 100%`}</span>
+        <span style={{ fontWeight: percentage >= 100 ? '700' : '400', color: percentage >= 100 ? 'var(--success)' : 'inherit' }}>
+          {remaining === 0 ? '🏆 Goal crushed this week! 🌟' : `${remaining} mins to 100%`}
+        </span>
       </div>
     </div>
   );
