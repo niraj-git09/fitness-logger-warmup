@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { calculateCalories } from './utils/calorieUtils';
 import { exportToCSV, exportToJSON } from './utils/exportUtils';
+import { API_BASE_URL } from './config';
 
 const CATEGORIES = ['All', 'Running', 'Weight Training', 'Cycling', 'Yoga', 'Swimming', 'Walking'];
 
@@ -31,7 +32,7 @@ function WorkoutFeed({ workouts: propWorkouts, loading: propLoading, onWorkoutCh
   const fetchWorkouts = async () => {
     const token = localStorage.getItem('token');
     try {
-      const response = await fetch('http://localhost:5000/api/workouts', {
+      const response = await fetch(`${API_BASE_URL}/api/workouts`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
 
@@ -167,7 +168,7 @@ function WorkoutFeed({ workouts: propWorkouts, loading: propLoading, onWorkoutCh
 
     const token = localStorage.getItem('token');
     try {
-      const response = await fetch(`http://localhost:5000/api/workouts/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/workouts/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -199,7 +200,7 @@ function WorkoutFeed({ workouts: propWorkouts, loading: propLoading, onWorkoutCh
   const handleSaveEdit = async (id) => {
     const token = localStorage.getItem('token');
     try {
-      const response = await fetch(`http://localhost:5000/api/workouts/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/workouts/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

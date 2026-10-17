@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const db = require('./db'); // Imports the database connection you just built
@@ -6,6 +7,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const app = express();
 const PORT = process.env.PORT || 5000;
+const JWT_SECRET = process.env.JWT_SECRET || 'my_super_secret_key';
 
 // ==========================================
 // 1. SETUP & GLOBAL MIDDLEWARE
@@ -73,7 +75,7 @@ app.post('/api/login', async (req, res) => {
             }
 
             // Create the JWT "VIP Wristband"
-            const token = jwt.sign({ userId: user.id }, 'my_super_secret_key', { expiresIn: '1h' });
+            const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '7d' });
 
             res.json({ 
                 message: '✅ Login successful!', 
@@ -99,7 +101,7 @@ const authenticateToken = (req, res, next) => {
         return res.status(401).json({ error: 'Access denied. No VIP wristband.' });
     }
 
-    jwt.verify(token, 'my_super_secret_key', (err, user) => {
+    jwt.verify(token, JWT_SECRET, (err, user) => {
         if (err) {
             return res.status(403).json({ error: 'Invalid or expired token.' });
         }

@@ -142,7 +142,7 @@ function Achievements({ workouts = [], profile }) {
 
     const unlockedCount = badgeList.filter(b => b.unlocked).length;
     return { achievements: badgeList, unlockedCount };
-  }, [workouts, profile, goal]);
+  }, [workouts, goal]);
 
   const displayedBadges = isExpanded ? achievements : achievements.slice(0, 4);
 

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 
 function SplashAnimation({ 
   message = "Welcome to FitCheck • Powering up your training hub...", 
@@ -10,14 +10,19 @@ function SplashAnimation({
   const videoRef = useRef(null);
   const completedRef = useRef(false);
 
-  const triggerComplete = () => {
+  const onCompleteRef = useRef(onComplete);
+  useEffect(() => {
+    onCompleteRef.current = onComplete;
+  }, [onComplete]);
+
+  const triggerComplete = useCallback(() => {
     if (completedRef.current) return;
     completedRef.current = true;
     setIsFadingOut(true);
     setTimeout(() => {
-      if (onComplete) onComplete();
+      if (onCompleteRef.current) onCompleteRef.current();
     }, 400); // Allow fade-out animation to finish
-  };
+  }, []);
 
   useEffect(() => {
     // 1. Progress bar animation
@@ -44,7 +49,7 @@ function SplashAnimation({
       clearInterval(interval);
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [durationMs]);
+  }, [durationMs, triggerComplete]);
 
   return (
     <div 

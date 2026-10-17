@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { triggerGoalCrushedConfetti } from './utils/confettiUtils';
+import { API_BASE_URL } from './config';
 
 function GoalTracker({ workouts = [], profile, onProfileUpdated }) {
   const [isEditingGoal, setIsEditingGoal] = useState(false);
@@ -36,11 +37,12 @@ function GoalTracker({ workouts = [], profile, onProfileUpdated }) {
   const remaining = Math.max(0, goal - weeklyMinutes);
 
   const prevPercentageRef = useRef(null);
+  const mondayStr = monday.toISOString().slice(0, 10);
 
   // Automatically celebrate with confetti when weekly goal reaches 100%
   useEffect(() => {
     if (percentage >= 100) {
-      const weekKey = `fitcheck_goal_celebrated_${monday.toISOString().slice(0, 10)}`;
+      const weekKey = `fitcheck_goal_celebrated_${mondayStr}`;
       const alreadyCelebrated = sessionStorage.getItem(weekKey);
       
       const justCrushed = prevPercentageRef.current !== null && prevPercentageRef.current < 100 && percentage >= 100;
@@ -54,7 +56,7 @@ function GoalTracker({ workouts = [], profile, onProfileUpdated }) {
       }
     }
     prevPercentageRef.current = percentage;
-  }, [percentage, monday]);
+  }, [percentage, mondayStr]);
 
   const handleSaveGoal = async (e) => {
     e.preventDefault();
@@ -63,7 +65,7 @@ function GoalTracker({ workouts = [], profile, onProfileUpdated }) {
     setIsSaving(true);
     const token = localStorage.getItem('token');
     try {
-      const response = await fetch('http://localhost:5000/api/user/profile', {
+      const response = await fetch(`${API_BASE_URL}/api/user/profile`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

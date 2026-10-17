@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { triggerWorkoutLoggedBurst } from './utils/confettiUtils';
+import { API_BASE_URL } from './config';
 
 const POPULAR_EXERCISES = [
   { name: 'Running', icon: '🏃' },
@@ -66,7 +67,7 @@ function WorkoutForm({ onWorkoutAdded, isModal = false, onClose, initialData = n
     const token = localStorage.getItem('token'); 
 
     try {
-      const response = await fetch('http://localhost:5000/api/workouts', {
+      const response = await fetch(`${API_BASE_URL}/api/workouts`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',

@@ -10,6 +10,7 @@ import WeeklyReportModal from './WeeklyReportModal';
 import FitnessCalculator from './FitnessCalculator';
 import SplashAnimation from './SplashAnimation';
 import { calculateTotalCalories } from './utils/calorieUtils';
+import { API_BASE_URL } from './config';
 
 function Dashboard() {
   const [workouts, setWorkouts] = useState([]);
@@ -34,7 +35,7 @@ function Dashboard() {
   const fetchWorkouts = async () => {
     const token = localStorage.getItem('token');
     try {
-      const response = await fetch('http://localhost:5000/api/workouts', {
+      const response = await fetch(`${API_BASE_URL}/api/workouts`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -56,7 +57,7 @@ function Dashboard() {
   const fetchProfile = async () => {
     const token = localStorage.getItem('token');
     try {
-      const response = await fetch('http://localhost:5000/api/user/profile', {
+      const response = await fetch(`${API_BASE_URL}/api/user/profile`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }

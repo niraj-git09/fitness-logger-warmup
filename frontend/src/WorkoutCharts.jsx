@@ -300,13 +300,4 @@ const statLabelStyle = {
   letterSpacing: '0.5px'
 };
 
-const chartContainerStyle = {
-  backgroundColor: 'var(--bg-card)',
-  border: '1px solid var(--border-color)',
-  borderRadius: '16px',
-  padding: '22px',
-  boxShadow: 'var(--shadow-sm)',
-  transition: 'background-color 0.3s ease, border-color 0.3s ease'
-};
-
 export default WorkoutCharts;
