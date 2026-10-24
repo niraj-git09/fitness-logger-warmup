@@ -138,6 +138,21 @@ function SplashAnimation({
           }}
         />
 
+        {/* Watermark Blocker: eliminates Gemini logo in bottom right corner */}
+        <div 
+          aria-hidden="true"
+          style={{
+            position: 'absolute',
+            bottom: '4px',
+            right: 0,
+            width: '15%',
+            height: '24%',
+            background: 'radial-gradient(ellipse at bottom right, #070b13 65%, rgba(7, 11, 19, 0.95) 80%, transparent 100%)',
+            pointerEvents: 'none',
+            zIndex: 4
+          }} 
+        />
+
         {/* Progress Bar inside Video Card */}
         <div style={{
           width: '100%',
@@ -145,7 +160,8 @@ function SplashAnimation({
           backgroundColor: 'rgba(255, 255, 255, 0.1)',
           position: 'absolute',
           bottom: 0,
-          left: 0
+          left: 0,
+          zIndex: 5
         }}>
           <div style={{
             width: `${progress}%`,

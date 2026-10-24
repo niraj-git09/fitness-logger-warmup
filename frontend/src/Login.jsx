@@ -34,6 +34,8 @@ function Login() {
       if (response.ok) {
         const data = await response.json();
         localStorage.setItem('token', data.token); 
+        // Mark intro as seen for this session so Dashboard won't replay it
+        sessionStorage.setItem('fitcheck_intro_seen', 'true');
         setShowSplash(true);
       } else {
         const data = await response.json();
@@ -50,8 +52,11 @@ function Login() {
     return (
       <SplashAnimation 
         message="Welcome back! Powering up your training hub..." 
-        durationMs={3500}
-        onComplete={() => navigate('/dashboard')} 
+        durationMs={3800}
+        onComplete={() => {
+          sessionStorage.setItem('fitcheck_intro_seen', 'true');
+          navigate('/dashboard');
+        }} 
       />
     );
   }

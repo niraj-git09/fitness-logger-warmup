@@ -48,8 +48,8 @@ function Register() {
   if (showSplash) {
     return (
       <SplashAnimation 
-        message="Account created! Welcome to FitCheck..." 
-        durationMs={3500}
+        message="Account created! Redirecting to login..." 
+        durationMs={3000}
         onComplete={() => navigate('/login?registered=true')} 
       />
     );
